@@ -20,7 +20,7 @@ import java.util.*;
 
 @Mod.EventBusSubscriber(modid = ParasitusFix.MODID)
 public class DoorSwap {
-    private static final Map<World, Set<BlockPos>> PENDING = new WeakHashMap<>();
+    private static final Map<World, Set<BlockPos>> PENDING = new HashMap<>();
 
     private static Set<BlockPos> queue(World w) {
         return PENDING.computeIfAbsent(w, k -> new HashSet<>());
@@ -43,6 +43,13 @@ public class DoorSwap {
         ResourceLocation id = Block.REGISTRY.getNameForObject(s.getBlock());
         return id != null && ParasitusDoors.SRC2MD_BLOCK.containsKey(id);
     }
+
+    @SubscribeEvent
+    public static void onWorldUnload(net.minecraftforge.event.world.WorldEvent.Unload e) {
+        if (e.getWorld().isRemote) return;
+        PENDING.remove(e.getWorld());
+    }
+
 
     @SubscribeEvent
     public static void onPlace(BlockEvent.PlaceEvent e) {
@@ -92,17 +99,36 @@ public class DoorSwap {
         Set<BlockPos> q = PENDING.get(w);
         if (q == null || q.isEmpty()) return;
 
-        int budget = 512;
-        Iterator<BlockPos> it = q.iterator();
-        while (budget-- > 0 && it.hasNext()) {
-            BlockPos pos = it.next();
-            if (!isSourceDoor(w, pos)) { it.remove(); continue; }
-            if (!bothHalvesLoaded(w, pos)) continue;
+        final int budget = 512;
 
+        // Take a snapshot and clear the live set.
+        // Any new adds during replacePair() will go into q safely.
+        List<BlockPos> snapshot = new ArrayList<>(q);
+        q.clear();
+
+        int processed = 0;
+        for (BlockPos pos : snapshot) {
+            if (processed >= budget) {
+                // not processed yet -> keep for next tick
+                q.add(pos);
+                continue;
+            }
+
+            // If it's no longer a source door, drop it
+            if (!isSourceDoor(w, pos)) continue;
+
+            // If the other half isn't loaded yet, re-queue it
+            if (!bothHalvesLoaded(w, pos)) {
+                q.add(pos);
+                continue;
+            }
+
+            // Do the swap
             replacePair(w, pos);
-            it.remove();
+            processed++;
         }
     }
+
 
     private static void replacePair(World w, BlockPos anyHalf) {
         BlockPos top = anyHalf;
