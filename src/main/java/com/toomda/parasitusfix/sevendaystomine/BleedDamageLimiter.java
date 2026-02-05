@@ -26,7 +26,7 @@ import java.util.UUID;
 @Mod.EventBusSubscriber(modid = ParasitusFix.MODID)
 public final class BleedDamageLimiter {
     private static final String MODID = "sevendaystomine";
-    private static final Map<UUID, Integer> LAST_BLEED_TICK = new HashMap<>();
+    private static final Map<UUID, Integer> NEXT_BLEED_TICK = new HashMap<>();
     private static final Map<UUID, Integer> ALLOW_BLEED_TICK = new HashMap<>();
 
     private BleedDamageLimiter() {}
@@ -60,8 +60,7 @@ public final class BleedDamageLimiter {
         WorldServer ws = getServerWorld(target);
         if (ws == null || !(target instanceof EntityPlayer)) return;
 
-        int interval = getIntervalTicks();
-        if (interval <= 1) return;
+        if (!isLimiterEnabled()) return;
 
         if (!target.isPotionActive(Potions.bleeding)) {
             clearBleedState(target.getUniqueID());
@@ -70,16 +69,18 @@ public final class BleedDamageLimiter {
 
         int now = ws.getMinecraftServer().getTickCounter();
         UUID id = target.getUniqueID();
-        Integer last = LAST_BLEED_TICK.get(id);
-        if (last == null) {
-            LAST_BLEED_TICK.put(id, now);
-            return;
-        }
-        if (now - last < interval) return;
+        Integer next = NEXT_BLEED_TICK.get(id);
+        if (next == null || now >= next) {
+            ALLOW_BLEED_TICK.put(id, now);
+            target.attackEntityFrom(DamageSources.bleeding, 1.0F);
 
-        LAST_BLEED_TICK.put(id, now);
-        ALLOW_BLEED_TICK.put(id, now);
-        target.attackEntityFrom(DamageSources.bleeding, 1.0F);
+            int interval = nextIntervalTicks(ws);
+            if (interval > 1) {
+                NEXT_BLEED_TICK.put(id, now + interval);
+            } else {
+                NEXT_BLEED_TICK.remove(id);
+            }
+        }
     }
 
     @SubscribeEvent
@@ -94,20 +95,19 @@ public final class BleedDamageLimiter {
         if (!shouldProcessDamageEvent(amount, canceled)) return false;
         if (!(target instanceof EntityPlayer)) return false;
         if (src == null || !isBleedDamageSource(src)) return false;
-        if (!target.isPotionActive(Potions.bleeding)) return false;
 
         WorldServer ws = getServerWorld(target);
         if (ws == null) return false;
 
-        int interval = getIntervalTicks();
-        if (interval <= 1) return false;
+        if (!isLimiterEnabled()) return false;
+        if (!target.isPotionActive(Potions.bleeding)) return false;
 
         int now = ws.getMinecraftServer().getTickCounter();
         UUID id = target.getUniqueID();
         Integer allowed = ALLOW_BLEED_TICK.get(id);
-        if (allowed != null && allowed == now) {
-            ALLOW_BLEED_TICK.remove(id);
-            return false;
+        if (allowed != null) {
+            if (allowed == now) return false;
+            if (allowed < now) ALLOW_BLEED_TICK.remove(id);
         }
 
         return true;
@@ -120,12 +120,39 @@ public final class BleedDamageLimiter {
         return t.toLowerCase(Locale.ROOT).contains("bleed");
     }
 
-    private static int getIntervalTicks() {
+    private static boolean isLimiterEnabled() {
+        if (!isNondeterministicEnabled()) {
+            return getDeterministicIntervalTicks() > 1;
+        }
+        IntervalRange range = getIntervalRange();
+        return range.max > 1;
+    }
+
+    private static int nextIntervalTicks(WorldServer ws) {
+        if (!isNondeterministicEnabled()) return getDeterministicIntervalTicks();
+        IntervalRange range = getIntervalRange();
+        if (range.max <= 1) return range.max;
+        int span = range.max - range.min + 1;
+        return range.min + ws.rand.nextInt(span);
+    }
+
+    private static int getDeterministicIntervalTicks() {
         return ParasitusFixConfig.BLEEDING.damageIntervalTicks;
     }
 
+    private static boolean isNondeterministicEnabled() {
+        return ParasitusFixConfig.BLEEDING.nondeterministicBleedingRate;
+    }
+
+    private static IntervalRange getIntervalRange() {
+        int min = Math.max(1, ParasitusFixConfig.BLEEDING.minDamageIntervalTicks);
+        int max = Math.max(1, ParasitusFixConfig.BLEEDING.maxDamageIntervalTicks);
+        if (max < min) max = min;
+        return new IntervalRange(min, max);
+    }
+
     private static void clearBleedState(UUID id) {
-        LAST_BLEED_TICK.remove(id);
+        NEXT_BLEED_TICK.remove(id);
         ALLOW_BLEED_TICK.remove(id);
     }
 
@@ -142,5 +169,15 @@ public final class BleedDamageLimiter {
 
     private static boolean isModLoaded() {
         return Loader.isModLoaded(MODID);
+    }
+
+    private static final class IntervalRange {
+        final int min;
+        final int max;
+
+        private IntervalRange(int min, int max) {
+            this.min = min;
+            this.max = max;
+        }
     }
 }

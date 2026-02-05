@@ -44,6 +44,15 @@ public final class ParasitusFixConfig {
         @Config.Comment("Minimum ticks between bleeding damage applications (1 = no throttling)")
         public int damageIntervalTicks = 20;
 
+        @Config.Comment("Use a random interval between min/max for bleeding damage ticks")
+        public boolean nondeterministicBleedingRate = false;
+
+        @Config.Comment("Minimum ticks between bleeding damage when nondeterministic rate is enabled")
+        public int minDamageIntervalTicks = 15;
+
+        @Config.Comment("Maximum ticks between bleeding damage when nondeterministic rate is enabled")
+        public int maxDamageIntervalTicks = 25;
+
         @Config.Comment("Bleeding potion amplifier")
         public int amplifier = 0;
     }
