@@ -14,20 +14,22 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.client.event.sound.PlaySoundEvent;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
-import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.relauncher.Side;
 
 import java.util.HashSet;
 import java.util.Set;
 
-// TODO: Temporarily disabled (bunkerdoor sound override).
+// Disabled for now (bunkerdoor sound override).
 // @Mod.EventBusSubscriber(modid = ParasitusFix.MODID, value = Side.CLIENT)
 @Deprecated
 public class TechgunsBunkerDoorSoundSuppressor {
+    @Deprecated
     private static final ResourceLocation BUNKER_DOOR_ID = new ResourceLocation("techguns", "bunkerdoor");
+    @Deprecated
     private static final ResourceLocation PF_OPEN = new ResourceLocation(ParasitusFix.MODID, "bunkerdoor_open");
+    @Deprecated
     private static final ResourceLocation PF_CLOSE = new ResourceLocation(ParasitusFix.MODID, "bunkerdoor_close");
+    @Deprecated
     private static final Set<ResourceLocation> DOOR_SOUNDS = new HashSet<>();
 
     static {
@@ -39,9 +41,8 @@ public class TechgunsBunkerDoorSoundSuppressor {
     }
 
     @SubscribeEvent
+    @Deprecated
     public static void onPlaySound(PlaySoundEvent event) {
-        // Disabled for now.
-        if (true) return;
         ISound sound = event.getSound();
         if (sound == null) return;
         ResourceLocation soundId = sound.getSoundLocation();
@@ -75,6 +76,7 @@ public class TechgunsBunkerDoorSoundSuppressor {
         event.setResultSound(new PositionedSoundRecord(replacement, SoundCategory.BLOCKS, volume, pitch, pos));
     }
 
+    @Deprecated
     private static IBlockState findBunkerDoorState(World world, BlockPos pos) {
         for (int dx = -1; dx <= 1; dx++) {
             for (int dy = -1; dy <= 1; dy++) {
