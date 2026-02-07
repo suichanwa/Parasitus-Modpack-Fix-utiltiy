@@ -13,6 +13,7 @@ import com.toomda.parasitusfix.sevendaystomine.SevenDaysChanceConfigGuard;
 import com.toomda.parasitusfix.sevendaystomine.SevenDaysDamagePatches;
 import com.toomda.parasitusfix.sevendaystomine.ZombieSpawnFix;
 import com.toomda.parasitusfix.techguns.TechgunsAttackHelicopterTargetFix;
+import com.toomda.parasitusfix.techguns.TechgunsAttackHelicopterNoDespawn;
 import com.toomda.parasitusfix.techguns.TechgunsSoldierZombieTargetFix;
 import net.minecraft.init.Blocks;
 import net.minecraftforge.common.MinecraftForge;
@@ -58,6 +59,7 @@ public class ParasitusFix
         }
         if (Loader.isModLoaded("techguns")) {
             MinecraftForge.EVENT_BUS.register(new TechgunsAttackHelicopterTargetFix());
+            MinecraftForge.EVENT_BUS.register(new TechgunsAttackHelicopterNoDespawn());
             MinecraftForge.EVENT_BUS.register(new TechgunsSoldierZombieTargetFix());
         }
         logger.info("DIRT BLOCK >> {}", Blocks.DIRT.getRegistryName());

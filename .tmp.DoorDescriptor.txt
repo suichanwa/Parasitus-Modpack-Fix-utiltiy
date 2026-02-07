@@ -1,0 +1,870 @@
+Compiled from "DoorDescriptor.java"
+public class net.malisis.doors.DoorDescriptor {
+  protected net.minecraft.block.Block block;
+
+  protected net.minecraft.item.Item item;
+
+  protected net.minecraft.block.material.Material material;
+
+  protected float hardness;
+
+  protected net.minecraft.block.SoundType soundType;
+
+  protected java.lang.String registryName;
+
+  protected java.lang.String unlocalizedName;
+
+  protected int autoCloseTime;
+
+  protected java.lang.String modid;
+
+  protected java.lang.String textureName;
+
+  protected java.lang.Class<? extends net.malisis.doors.tileentity.DoorTileEntity> tileEntityClass;
+
+  protected net.malisis.doors.movement.IDoorMovement movement;
+
+  protected net.malisis.doors.sound.IDoorSound sound;
+
+  protected int openingTime;
+
+  protected boolean doubleDoor;
+
+  protected boolean proximityDetection;
+
+  protected net.malisis.doors.DoorDescriptor$RedstoneBehavior redstoneBehavior;
+
+  protected net.minecraft.creativetab.CreativeTabs tab;
+
+  protected int maxStackSize;
+
+  protected java.lang.String code;
+
+  public net.malisis.doors.DoorDescriptor();
+    Code:
+       0: aload_0
+       1: invokespecial #46                 // Method java/lang/Object."<init>":()V
+       4: aload_0
+       5: getstatic     #51                 // Field net/minecraft/block/material/Material.field_151575_d:Lnet/minecraft/block/material/Material;
+       8: putfield      #53                 // Field material:Lnet/minecraft/block/material/Material;
+      11: aload_0
+      12: ldc           #54                 // float 3.0f
+      14: putfield      #56                 // Field hardness:F
+      17: aload_0
+      18: getstatic     #61                 // Field net/minecraft/block/SoundType.field_185848_a:Lnet/minecraft/block/SoundType;
+      21: putfield      #63                 // Field soundType:Lnet/minecraft/block/SoundType;
+      24: aload_0
+      25: iconst_0
+      26: putfield      #65                 // Field autoCloseTime:I
+      29: aload_0
+      30: ldc           #67                 // class net/malisis/doors/tileentity/DoorTileEntity
+      32: putfield      #69                 // Field tileEntityClass:Ljava/lang/Class;
+      35: aload_0
+      36: bipush        6
+      38: putfield      #71                 // Field openingTime:I
+      41: aload_0
+      42: iconst_1
+      43: putfield      #73                 // Field doubleDoor:Z
+      46: aload_0
+      47: iconst_0
+      48: putfield      #75                 // Field proximityDetection:Z
+      51: aload_0
+      52: getstatic     #78                 // Field net/malisis/doors/DoorDescriptor$RedstoneBehavior.STANDARD:Lnet/malisis/doors/DoorDescriptor$RedstoneBehavior;
+      55: putfield      #80                 // Field redstoneBehavior:Lnet/malisis/doors/DoorDescriptor$RedstoneBehavior;
+      58: aload_0
+      59: bipush        64
+      61: putfield      #82                 // Field maxStackSize:I
+      64: aload_0
+      65: aconst_null
+      66: putfield      #84                 // Field code:Ljava/lang/String;
+      69: aload_0
+      70: ldc           #86                 // class net/malisis/doors/movement/RotatingDoorMovement
+      72: invokestatic  #92                 // Method net/malisis/doors/DoorRegistry.getMovement:(Ljava/lang/Class;)Lnet/malisis/doors/movement/IDoorMovement;
+      75: putfield      #94                 // Field movement:Lnet/malisis/doors/movement/IDoorMovement;
+      78: aload_0
+      79: ldc           #96                 // class net/malisis/doors/sound/WoodenDoorSound
+      81: invokestatic  #100                // Method net/malisis/doors/DoorRegistry.getSound:(Ljava/lang/Class;)Lnet/malisis/doors/sound/IDoorSound;
+      84: putfield      #102                // Field sound:Lnet/malisis/doors/sound/IDoorSound;
+      87: return
+
+  public net.malisis.doors.DoorDescriptor(net.minecraft.nbt.NBTTagCompound);
+    Code:
+       0: aload_0
+       1: invokespecial #46                 // Method java/lang/Object."<init>":()V
+       4: aload_0
+       5: getstatic     #51                 // Field net/minecraft/block/material/Material.field_151575_d:Lnet/minecraft/block/material/Material;
+       8: putfield      #53                 // Field material:Lnet/minecraft/block/material/Material;
+      11: aload_0
+      12: ldc           #54                 // float 3.0f
+      14: putfield      #56                 // Field hardness:F
+      17: aload_0
+      18: getstatic     #61                 // Field net/minecraft/block/SoundType.field_185848_a:Lnet/minecraft/block/SoundType;
+      21: putfield      #63                 // Field soundType:Lnet/minecraft/block/SoundType;
+      24: aload_0
+      25: iconst_0
+      26: putfield      #65                 // Field autoCloseTime:I
+      29: aload_0
+      30: ldc           #67                 // class net/malisis/doors/tileentity/DoorTileEntity
+      32: putfield      #69                 // Field tileEntityClass:Ljava/lang/Class;
+      35: aload_0
+      36: bipush        6
+      38: putfield      #71                 // Field openingTime:I
+      41: aload_0
+      42: iconst_1
+      43: putfield      #73                 // Field doubleDoor:Z
+      46: aload_0
+      47: iconst_0
+      48: putfield      #75                 // Field proximityDetection:Z
+      51: aload_0
+      52: getstatic     #78                 // Field net/malisis/doors/DoorDescriptor$RedstoneBehavior.STANDARD:Lnet/malisis/doors/DoorDescriptor$RedstoneBehavior;
+      55: putfield      #80                 // Field redstoneBehavior:Lnet/malisis/doors/DoorDescriptor$RedstoneBehavior;
+      58: aload_0
+      59: bipush        64
+      61: putfield      #82                 // Field maxStackSize:I
+      64: aload_0
+      65: aconst_null
+      66: putfield      #84                 // Field code:Ljava/lang/String;
+      69: aload_1
+      70: ifnull        81
+      73: aload_0
+      74: aload_1
+      75: invokevirtual #108                // Method readNBT:(Lnet/minecraft/nbt/NBTTagCompound;)V
+      78: goto          99
+      81: aload_0
+      82: ldc           #86                 // class net/malisis/doors/movement/RotatingDoorMovement
+      84: invokestatic  #92                 // Method net/malisis/doors/DoorRegistry.getMovement:(Ljava/lang/Class;)Lnet/malisis/doors/movement/IDoorMovement;
+      87: putfield      #94                 // Field movement:Lnet/malisis/doors/movement/IDoorMovement;
+      90: aload_0
+      91: ldc           #96                 // class net/malisis/doors/sound/WoodenDoorSound
+      93: invokestatic  #100                // Method net/malisis/doors/DoorRegistry.getSound:(Ljava/lang/Class;)Lnet/malisis/doors/sound/IDoorSound;
+      96: putfield      #102                // Field sound:Lnet/malisis/doors/sound/IDoorSound;
+      99: return
+
+  public net.minecraft.block.Block getBlock();
+    Code:
+       0: aload_0
+       1: getfield      #116                // Field block:Lnet/minecraft/block/Block;
+       4: areturn
+
+  public net.minecraft.item.Item getItem();
+    Code:
+       0: aload_0
+       1: getfield      #120                // Field item:Lnet/minecraft/item/Item;
+       4: areturn
+
+  public net.minecraft.block.material.Material getMaterial();
+    Code:
+       0: aload_0
+       1: getfield      #53                 // Field material:Lnet/minecraft/block/material/Material;
+       4: areturn
+
+  public void setMaterial(net.minecraft.block.material.Material);
+    Code:
+       0: aload_0
+       1: aload_1
+       2: putfield      #53                 // Field material:Lnet/minecraft/block/material/Material;
+       5: return
+
+  public float getHardness();
+    Code:
+       0: aload_0
+       1: getfield      #56                 // Field hardness:F
+       4: freturn
+
+  public void setHardness(float);
+    Code:
+       0: aload_0
+       1: fload_1
+       2: putfield      #56                 // Field hardness:F
+       5: return
+
+  public net.minecraft.block.SoundType getSoundType();
+    Code:
+       0: aload_0
+       1: getfield      #63                 // Field soundType:Lnet/minecraft/block/SoundType;
+       4: areturn
+
+  public void setSoundType(net.minecraft.block.SoundType);
+    Code:
+       0: aload_0
+       1: aload_1
+       2: putfield      #63                 // Field soundType:Lnet/minecraft/block/SoundType;
+       5: return
+
+  public java.lang.String getRegistryName();
+    Code:
+       0: aload_0
+       1: getfield      #136                // Field registryName:Ljava/lang/String;
+       4: areturn
+
+  public void setName(java.lang.String);
+    Code:
+       0: aload_0
+       1: aload_1
+       2: invokevirtual #141                // Method setRegistryName:(Ljava/lang/String;)V
+       5: aload_0
+       6: aload_1
+       7: invokevirtual #144                // Method setUnlocalizedName:(Ljava/lang/String;)V
+      10: return
+
+  public void setRegistryName(java.lang.String);
+    Code:
+       0: aload_0
+       1: aload_1
+       2: putfield      #136                // Field registryName:Ljava/lang/String;
+       5: return
+
+  public java.lang.String getUnlocalizedName();
+    Code:
+       0: aload_0
+       1: getfield      #148                // Field unlocalizedName:Ljava/lang/String;
+       4: areturn
+
+  public void setUnlocalizedName(java.lang.String);
+    Code:
+       0: aload_0
+       1: aload_1
+       2: putfield      #148                // Field unlocalizedName:Ljava/lang/String;
+       5: return
+
+  public java.lang.String getModId();
+    Code:
+       0: aload_0
+       1: getfield      #151                // Field modid:Ljava/lang/String;
+       4: areturn
+
+  public java.lang.String getTextureName();
+    Code:
+       0: aload_0
+       1: getfield      #154                // Field textureName:Ljava/lang/String;
+       4: areturn
+
+  public void setTextureName(java.lang.String, java.lang.String);
+    Code:
+       0: aload_0
+       1: aload_1
+       2: putfield      #151                // Field modid:Ljava/lang/String;
+       5: aload_0
+       6: aload_2
+       7: putfield      #154                // Field textureName:Ljava/lang/String;
+      10: return
+
+  public java.lang.Class<? extends net.malisis.doors.tileentity.DoorTileEntity> getTileEntityClass();
+    Code:
+       0: aload_0
+       1: getfield      #69                 // Field tileEntityClass:Ljava/lang/Class;
+       4: areturn
+
+  public void setTileEntityClass(java.lang.Class<? extends net.malisis.doors.tileentity.DoorTileEntity>);
+    Code:
+       0: aload_0
+       1: aload_1
+       2: putfield      #69                 // Field tileEntityClass:Ljava/lang/Class;
+       5: return
+
+  public net.malisis.doors.movement.IDoorMovement getMovement();
+    Code:
+       0: aload_0
+       1: getfield      #94                 // Field movement:Lnet/malisis/doors/movement/IDoorMovement;
+       4: areturn
+
+  public void setMovement(net.malisis.doors.movement.IDoorMovement);
+    Code:
+       0: aload_0
+       1: aload_1
+       2: putfield      #94                 // Field movement:Lnet/malisis/doors/movement/IDoorMovement;
+       5: return
+
+  public net.malisis.doors.sound.IDoorSound getSound();
+    Code:
+       0: aload_0
+       1: getfield      #102                // Field sound:Lnet/malisis/doors/sound/IDoorSound;
+       4: areturn
+
+  public void setSound(net.malisis.doors.sound.IDoorSound);
+    Code:
+       0: aload_0
+       1: aload_1
+       2: putfield      #102                // Field sound:Lnet/malisis/doors/sound/IDoorSound;
+       5: return
+
+  public int getOpeningTime();
+    Code:
+       0: aload_0
+       1: getfield      #71                 // Field openingTime:I
+       4: ireturn
+
+  public void setOpeningTime(int);
+    Code:
+       0: aload_0
+       1: iload_1
+       2: putfield      #71                 // Field openingTime:I
+       5: return
+
+  public boolean isDoubleDoor();
+    Code:
+       0: aload_0
+       1: getfield      #73                 // Field doubleDoor:Z
+       4: ireturn
+
+  public void setDoubleDoor(boolean);
+    Code:
+       0: aload_0
+       1: iload_1
+       2: putfield      #73                 // Field doubleDoor:Z
+       5: return
+
+  public boolean hasProximityDetection();
+    Code:
+       0: aload_0
+       1: getfield      #75                 // Field proximityDetection:Z
+       4: ireturn
+
+  public void setProximityDetection(boolean);
+    Code:
+       0: aload_0
+       1: iload_1
+       2: putfield      #75                 // Field proximityDetection:Z
+       5: return
+
+  public net.malisis.doors.DoorDescriptor$RedstoneBehavior getRedstoneBehavior();
+    Code:
+       0: aload_0
+       1: getfield      #80                 // Field redstoneBehavior:Lnet/malisis/doors/DoorDescriptor$RedstoneBehavior;
+       4: areturn
+
+  public void setRedstoneBehavior(net.malisis.doors.DoorDescriptor$RedstoneBehavior);
+    Code:
+       0: aload_0
+       1: aload_1
+       2: putfield      #80                 // Field redstoneBehavior:Lnet/malisis/doors/DoorDescriptor$RedstoneBehavior;
+       5: return
+
+  public int getAutoCloseTime();
+    Code:
+       0: aload_0
+       1: getfield      #65                 // Field autoCloseTime:I
+       4: ireturn
+
+  public void setAutoCloseTime(int);
+    Code:
+       0: aload_0
+       1: iload_1
+       2: putfield      #65                 // Field autoCloseTime:I
+       5: return
+
+  public net.minecraft.creativetab.CreativeTabs getTab();
+    Code:
+       0: aload_0
+       1: getfield      #188                // Field tab:Lnet/minecraft/creativetab/CreativeTabs;
+       4: areturn
+
+  public void setTab(net.minecraft.creativetab.CreativeTabs);
+    Code:
+       0: aload_0
+       1: aload_1
+       2: putfield      #188                // Field tab:Lnet/minecraft/creativetab/CreativeTabs;
+       5: return
+
+  public int getMaxStackSize();
+    Code:
+       0: aload_0
+       1: getfield      #82                 // Field maxStackSize:I
+       4: ireturn
+
+  public void setMaxStackSize(int);
+    Code:
+       0: aload_0
+       1: iload_1
+       2: putfield      #82                 // Field maxStackSize:I
+       5: return
+
+  public void setCode(java.lang.String);
+    Code:
+       0: aload_0
+       1: aload_1
+       2: putfield      #84                 // Field code:Ljava/lang/String;
+       5: return
+
+  public java.lang.String getCode();
+    Code:
+       0: aload_0
+       1: getfield      #84                 // Field code:Ljava/lang/String;
+       4: areturn
+
+  public boolean hasCode();
+    Code:
+       0: aload_0
+       1: getfield      #84                 // Field code:Ljava/lang/String;
+       4: invokestatic  #201                // Method org/apache/commons/lang3/StringUtils.isEmpty:(Ljava/lang/CharSequence;)Z
+       7: ifne          14
+      10: iconst_1
+      11: goto          15
+      14: iconst_0
+      15: ireturn
+
+  public void readNBT(net.minecraft.nbt.NBTTagCompound);
+    Code:
+       0: aload_1
+       1: ldc           #202                // String name
+       3: invokevirtual #206                // Method net/minecraft/nbt/NBTTagCompound.func_74764_b:(Ljava/lang/String;)Z
+       6: ifeq          19
+       9: aload_0
+      10: aload_1
+      11: ldc           #202                // String name
+      13: invokevirtual #210                // Method net/minecraft/nbt/NBTTagCompound.func_74779_i:(Ljava/lang/String;)Ljava/lang/String;
+      16: putfield      #136                // Field registryName:Ljava/lang/String;
+      19: aload_1
+      20: ldc           #211                // String modid
+      22: invokevirtual #206                // Method net/minecraft/nbt/NBTTagCompound.func_74764_b:(Ljava/lang/String;)Z
+      25: ifeq          38
+      28: aload_0
+      29: aload_1
+      30: ldc           #211                // String modid
+      32: invokevirtual #210                // Method net/minecraft/nbt/NBTTagCompound.func_74779_i:(Ljava/lang/String;)Ljava/lang/String;
+      35: putfield      #151                // Field modid:Ljava/lang/String;
+      38: aload_1
+      39: ldc           #212                // String textureName
+      41: invokevirtual #206                // Method net/minecraft/nbt/NBTTagCompound.func_74764_b:(Ljava/lang/String;)Z
+      44: ifeq          57
+      47: aload_0
+      48: aload_1
+      49: ldc           #212                // String textureName
+      51: invokevirtual #210                // Method net/minecraft/nbt/NBTTagCompound.func_74779_i:(Ljava/lang/String;)Ljava/lang/String;
+      54: putfield      #154                // Field textureName:Ljava/lang/String;
+      57: aload_1
+      58: ldc           #213                // String hardness
+      60: invokevirtual #206                // Method net/minecraft/nbt/NBTTagCompound.func_74764_b:(Ljava/lang/String;)Z
+      63: ifeq          76
+      66: aload_0
+      67: aload_1
+      68: ldc           #213                // String hardness
+      70: invokevirtual #217                // Method net/minecraft/nbt/NBTTagCompound.func_74760_g:(Ljava/lang/String;)F
+      73: putfield      #56                 // Field hardness:F
+      76: aload_1
+      77: ldc           #218                // String block
+      79: invokevirtual #206                // Method net/minecraft/nbt/NBTTagCompound.func_74764_b:(Ljava/lang/String;)Z
+      82: ifeq          98
+      85: aload_0
+      86: aload_1
+      87: ldc           #218                // String block
+      89: invokevirtual #222                // Method net/minecraft/nbt/NBTTagCompound.func_74762_e:(Ljava/lang/String;)I
+      92: invokestatic  #228                // Method net/minecraft/block/Block.func_149729_e:(I)Lnet/minecraft/block/Block;
+      95: putfield      #116                // Field block:Lnet/minecraft/block/Block;
+      98: aload_1
+      99: ldc           #229                // String item
+     101: invokevirtual #206                // Method net/minecraft/nbt/NBTTagCompound.func_74764_b:(Ljava/lang/String;)Z
+     104: ifeq          120
+     107: aload_0
+     108: aload_1
+     109: ldc           #229                // String item
+     111: invokevirtual #222                // Method net/minecraft/nbt/NBTTagCompound.func_74762_e:(Ljava/lang/String;)I
+     114: invokestatic  #235                // Method net/minecraft/item/Item.func_150899_d:(I)Lnet/minecraft/item/Item;
+     117: putfield      #120                // Field item:Lnet/minecraft/item/Item;
+     120: aload_1
+     121: ldc           #236                // String movement
+     123: invokevirtual #206                // Method net/minecraft/nbt/NBTTagCompound.func_74764_b:(Ljava/lang/String;)Z
+     126: ifeq          142
+     129: aload_0
+     130: aload_1
+     131: ldc           #236                // String movement
+     133: invokevirtual #210                // Method net/minecraft/nbt/NBTTagCompound.func_74779_i:(Ljava/lang/String;)Ljava/lang/String;
+     136: invokestatic  #239                // Method net/malisis/doors/DoorRegistry.getMovement:(Ljava/lang/String;)Lnet/malisis/doors/movement/IDoorMovement;
+     139: invokevirtual #241                // Method setMovement:(Lnet/malisis/doors/movement/IDoorMovement;)V
+     142: aload_1
+     143: ldc           #242                // String sound
+     145: invokevirtual #206                // Method net/minecraft/nbt/NBTTagCompound.func_74764_b:(Ljava/lang/String;)Z
+     148: ifeq          164
+     151: aload_0
+     152: aload_1
+     153: ldc           #242                // String sound
+     155: invokevirtual #210                // Method net/minecraft/nbt/NBTTagCompound.func_74779_i:(Ljava/lang/String;)Ljava/lang/String;
+     158: invokestatic  #245                // Method net/malisis/doors/DoorRegistry.getSound:(Ljava/lang/String;)Lnet/malisis/doors/sound/IDoorSound;
+     161: invokevirtual #247                // Method setSound:(Lnet/malisis/doors/sound/IDoorSound;)V
+     164: aload_1
+     165: ldc           #248                // String openingTime
+     167: invokevirtual #206                // Method net/minecraft/nbt/NBTTagCompound.func_74764_b:(Ljava/lang/String;)Z
+     170: ifeq          183
+     173: aload_0
+     174: aload_1
+     175: ldc           #248                // String openingTime
+     177: invokevirtual #222                // Method net/minecraft/nbt/NBTTagCompound.func_74762_e:(Ljava/lang/String;)I
+     180: invokevirtual #250                // Method setOpeningTime:(I)V
+     183: aload_1
+     184: ldc           #252                // String redstone
+     186: invokevirtual #206                // Method net/minecraft/nbt/NBTTagCompound.func_74764_b:(Ljava/lang/String;)Z
+     189: ifeq          214
+     192: aload_0
+     193: aload_1
+     194: ldc           #252                // String redstone
+     196: invokevirtual #255                // Method net/minecraft/nbt/NBTTagCompound.func_74767_n:(Ljava/lang/String;)Z
+     199: ifeq          208
+     202: getstatic     #258                // Field net/malisis/doors/DoorDescriptor$RedstoneBehavior.REDSTONE_ONLY:Lnet/malisis/doors/DoorDescriptor$RedstoneBehavior;
+     205: goto          211
+     208: getstatic     #78                 // Field net/malisis/doors/DoorDescriptor$RedstoneBehavior.STANDARD:Lnet/malisis/doors/DoorDescriptor$RedstoneBehavior;
+     211: invokevirtual #260                // Method setRedstoneBehavior:(Lnet/malisis/doors/DoorDescriptor$RedstoneBehavior;)V
+     214: aload_1
+     215: ldc_w         #261                // String redstoneBehavior
+     218: invokevirtual #206                // Method net/minecraft/nbt/NBTTagCompound.func_74764_b:(Ljava/lang/String;)Z
+     221: ifeq          239
+     224: aload_0
+     225: invokestatic  #265                // Method net/malisis/doors/DoorDescriptor$RedstoneBehavior.values:()[Lnet/malisis/doors/DoorDescriptor$RedstoneBehavior;
+     228: aload_1
+     229: ldc_w         #261                // String redstoneBehavior
+     232: invokevirtual #222                // Method net/minecraft/nbt/NBTTagCompound.func_74762_e:(Ljava/lang/String;)I
+     235: aaload
+     236: invokevirtual #260                // Method setRedstoneBehavior:(Lnet/malisis/doors/DoorDescriptor$RedstoneBehavior;)V
+     239: aload_1
+     240: ldc_w         #266                // String doubleDoor
+     243: invokevirtual #206                // Method net/minecraft/nbt/NBTTagCompound.func_74764_b:(Ljava/lang/String;)Z
+     246: ifeq          260
+     249: aload_0
+     250: aload_1
+     251: ldc_w         #266                // String doubleDoor
+     254: invokevirtual #255                // Method net/minecraft/nbt/NBTTagCompound.func_74767_n:(Ljava/lang/String;)Z
+     257: invokevirtual #268                // Method setDoubleDoor:(Z)V
+     260: aload_1
+     261: ldc_w         #269                // String proximityDetection
+     264: invokevirtual #206                // Method net/minecraft/nbt/NBTTagCompound.func_74764_b:(Ljava/lang/String;)Z
+     267: ifeq          281
+     270: aload_0
+     271: aload_1
+     272: ldc_w         #269                // String proximityDetection
+     275: invokevirtual #255                // Method net/minecraft/nbt/NBTTagCompound.func_74767_n:(Ljava/lang/String;)Z
+     278: invokevirtual #271                // Method setProximityDetection:(Z)V
+     281: aload_1
+     282: ldc_w         #272                // String autoCloseTime
+     285: invokevirtual #206                // Method net/minecraft/nbt/NBTTagCompound.func_74764_b:(Ljava/lang/String;)Z
+     288: ifeq          302
+     291: aload_0
+     292: aload_1
+     293: ldc_w         #272                // String autoCloseTime
+     296: invokevirtual #222                // Method net/minecraft/nbt/NBTTagCompound.func_74762_e:(Ljava/lang/String;)I
+     299: invokevirtual #274                // Method setAutoCloseTime:(I)V
+     302: aload_1
+     303: ldc_w         #275                // String code
+     306: invokevirtual #206                // Method net/minecraft/nbt/NBTTagCompound.func_74764_b:(Ljava/lang/String;)Z
+     309: ifeq          323
+     312: aload_0
+     313: aload_1
+     314: ldc_w         #275                // String code
+     317: invokevirtual #210                // Method net/minecraft/nbt/NBTTagCompound.func_74779_i:(Ljava/lang/String;)Ljava/lang/String;
+     320: invokevirtual #277                // Method setCode:(Ljava/lang/String;)V
+     323: return
+
+  public void writeNBT(net.minecraft.nbt.NBTTagCompound);
+    Code:
+       0: aload_1
+       1: ldc           #218                // String block
+       3: aload_0
+       4: getfield      #116                // Field block:Lnet/minecraft/block/Block;
+       7: invokestatic  #282                // Method net/minecraft/block/Block.func_149682_b:(Lnet/minecraft/block/Block;)I
+      10: invokevirtual #286                // Method net/minecraft/nbt/NBTTagCompound.func_74768_a:(Ljava/lang/String;I)V
+      13: aload_1
+      14: ldc           #229                // String item
+      16: aload_0
+      17: getfield      #120                // Field item:Lnet/minecraft/item/Item;
+      20: invokestatic  #290                // Method net/minecraft/item/Item.func_150891_b:(Lnet/minecraft/item/Item;)I
+      23: invokevirtual #286                // Method net/minecraft/nbt/NBTTagCompound.func_74768_a:(Ljava/lang/String;I)V
+      26: aload_0
+      27: invokevirtual #292                // Method getMovement:()Lnet/malisis/doors/movement/IDoorMovement;
+      30: ifnull        46
+      33: aload_1
+      34: ldc           #236                // String movement
+      36: aload_0
+      37: invokevirtual #292                // Method getMovement:()Lnet/malisis/doors/movement/IDoorMovement;
+      40: invokestatic  #296                // Method net/malisis/doors/DoorRegistry.getId:(Lnet/malisis/doors/movement/IDoorMovement;)Ljava/lang/String;
+      43: invokevirtual #299                // Method net/minecraft/nbt/NBTTagCompound.func_74778_a:(Ljava/lang/String;Ljava/lang/String;)V
+      46: aload_0
+      47: invokevirtual #301                // Method getSound:()Lnet/malisis/doors/sound/IDoorSound;
+      50: ifnull        66
+      53: aload_1
+      54: ldc           #242                // String sound
+      56: aload_0
+      57: invokevirtual #301                // Method getSound:()Lnet/malisis/doors/sound/IDoorSound;
+      60: invokestatic  #304                // Method net/malisis/doors/DoorRegistry.getId:(Lnet/malisis/doors/sound/IDoorSound;)Ljava/lang/String;
+      63: invokevirtual #299                // Method net/minecraft/nbt/NBTTagCompound.func_74778_a:(Ljava/lang/String;Ljava/lang/String;)V
+      66: aload_1
+      67: ldc           #248                // String openingTime
+      69: aload_0
+      70: invokevirtual #306                // Method getOpeningTime:()I
+      73: invokevirtual #286                // Method net/minecraft/nbt/NBTTagCompound.func_74768_a:(Ljava/lang/String;I)V
+      76: aload_1
+      77: ldc_w         #261                // String redstoneBehavior
+      80: aload_0
+      81: invokevirtual #308                // Method getRedstoneBehavior:()Lnet/malisis/doors/DoorDescriptor$RedstoneBehavior;
+      84: invokevirtual #311                // Method net/malisis/doors/DoorDescriptor$RedstoneBehavior.ordinal:()I
+      87: invokevirtual #286                // Method net/minecraft/nbt/NBTTagCompound.func_74768_a:(Ljava/lang/String;I)V
+      90: aload_1
+      91: ldc_w         #266                // String doubleDoor
+      94: aload_0
+      95: invokevirtual #313                // Method isDoubleDoor:()Z
+      98: invokevirtual #317                // Method net/minecraft/nbt/NBTTagCompound.func_74757_a:(Ljava/lang/String;Z)V
+     101: aload_1
+     102: ldc_w         #269                // String proximityDetection
+     105: aload_0
+     106: invokevirtual #319                // Method hasProximityDetection:()Z
+     109: invokevirtual #317                // Method net/minecraft/nbt/NBTTagCompound.func_74757_a:(Ljava/lang/String;Z)V
+     112: aload_1
+     113: ldc_w         #272                // String autoCloseTime
+     116: aload_0
+     117: invokevirtual #321                // Method getAutoCloseTime:()I
+     120: invokevirtual #286                // Method net/minecraft/nbt/NBTTagCompound.func_74768_a:(Ljava/lang/String;I)V
+     123: aload_0
+     124: invokevirtual #323                // Method hasCode:()Z
+     127: ifeq          144
+     130: aload_1
+     131: ldc_w         #275                // String code
+     134: aload_0
+     135: invokevirtual #325                // Method getCode:()Ljava/lang/String;
+     138: invokevirtual #299                // Method net/minecraft/nbt/NBTTagCompound.func_74778_a:(Ljava/lang/String;Ljava/lang/String;)V
+     141: goto          151
+     144: aload_1
+     145: ldc_w         #275                // String code
+     148: invokevirtual #328                // Method net/minecraft/nbt/NBTTagCompound.func_82580_o:(Ljava/lang/String;)V
+     151: return
+
+  public void set(net.minecraft.block.Block, net.minecraft.item.Item);
+    Code:
+       0: aload_0
+       1: aload_1
+       2: putfield      #116                // Field block:Lnet/minecraft/block/Block;
+       5: aload_0
+       6: aload_2
+       7: putfield      #120                // Field item:Lnet/minecraft/item/Item;
+      10: return
+
+  public void create();
+    Code:
+       0: aload_0
+       1: new           #333                // class net/malisis/doors/block/Door
+       4: dup
+       5: aload_0
+       6: invokespecial #336                // Method net/malisis/doors/block/Door."<init>":(Lnet/malisis/doors/DoorDescriptor;)V
+       9: putfield      #116                // Field block:Lnet/minecraft/block/Block;
+      12: aload_0
+      13: new           #338                // class net/malisis/doors/item/DoorItem
+      16: dup
+      17: aload_0
+      18: invokespecial #339                // Method net/malisis/doors/item/DoorItem."<init>":(Lnet/malisis/doors/DoorDescriptor;)V
+      21: putfield      #120                // Field item:Lnet/minecraft/item/Item;
+      24: return
+
+  public net.malisis.doors.DoorDescriptor register();
+    Code:
+       0: aload_0
+       1: getfield      #116                // Field block:Lnet/minecraft/block/Block;
+       4: ifnull        14
+       7: aload_0
+       8: getfield      #120                // Field item:Lnet/minecraft/item/Item;
+      11: ifnonnull     18
+      14: aload_0
+      15: invokevirtual #343                // Method create:()V
+      18: aload_0
+      19: getfield      #116                // Field block:Lnet/minecraft/block/Block;
+      22: instanceof    #345                // class net/malisis/core/block/IRegisterable
+      25: ifeq          41
+      28: aload_0
+      29: getfield      #116                // Field block:Lnet/minecraft/block/Block;
+      32: checkcast     #345                // class net/malisis/core/block/IRegisterable
+      35: invokestatic  #350                // Method net/malisis/core/registry/MalisisRegistry.register:(Lnet/malisis/core/block/IRegisterable;)V
+      38: goto          53
+      41: getstatic     #356                // Field net/minecraftforge/fml/common/registry/ForgeRegistries.BLOCKS:Lnet/minecraftforge/registries/IForgeRegistry;
+      44: aload_0
+      45: getfield      #116                // Field block:Lnet/minecraft/block/Block;
+      48: invokeinterface #361,  2          // InterfaceMethod net/minecraftforge/registries/IForgeRegistry.register:(Lnet/minecraftforge/registries/IForgeRegistryEntry;)V
+      53: aload_0
+      54: getfield      #120                // Field item:Lnet/minecraft/item/Item;
+      57: instanceof    #345                // class net/malisis/core/block/IRegisterable
+      60: ifeq          76
+      63: aload_0
+      64: getfield      #120                // Field item:Lnet/minecraft/item/Item;
+      67: checkcast     #345                // class net/malisis/core/block/IRegisterable
+      70: invokestatic  #350                // Method net/malisis/core/registry/MalisisRegistry.register:(Lnet/malisis/core/block/IRegisterable;)V
+      73: goto          88
+      76: getstatic     #364                // Field net/minecraftforge/fml/common/registry/ForgeRegistries.ITEMS:Lnet/minecraftforge/registries/IForgeRegistry;
+      79: aload_0
+      80: getfield      #120                // Field item:Lnet/minecraft/item/Item;
+      83: invokeinterface #361,  2          // InterfaceMethod net/minecraftforge/registries/IForgeRegistry.register:(Lnet/minecraftforge/registries/IForgeRegistryEntry;)V
+      88: aload_0
+      89: areturn
+
+  public static org.apache.commons.lang3.tuple.Pair<net.minecraft.block.Block, net.minecraft.item.Item> createDoor(java.util.HashMap<java.lang.String, java.lang.Object>);
+    Code:
+       0: invokestatic  #374                // Method net/minecraftforge/fml/common/Loader.instance:()Lnet/minecraftforge/fml/common/Loader;
+       3: invokevirtual #378                // Method net/minecraftforge/fml/common/Loader.getLoaderState:()Lnet/minecraftforge/fml/common/LoaderState;
+       6: getstatic     #384                // Field net/minecraftforge/fml/common/LoaderState.PREINITIALIZATION:Lnet/minecraftforge/fml/common/LoaderState;
+       9: if_acmpeq     34
+      12: getstatic     #390                // Field net/malisis/core/MalisisCore.log:Lorg/apache/logging/log4j/Logger;
+      15: ldc_w         #392                // String Tried to create and register a new door during wrong loader phase (was {}, expected {}).
+      18: invokestatic  #374                // Method net/minecraftforge/fml/common/Loader.instance:()Lnet/minecraftforge/fml/common/Loader;
+      21: invokevirtual #378                // Method net/minecraftforge/fml/common/Loader.getLoaderState:()Lnet/minecraftforge/fml/common/LoaderState;
+      24: getstatic     #384                // Field net/minecraftforge/fml/common/LoaderState.PREINITIALIZATION:Lnet/minecraftforge/fml/common/LoaderState;
+      27: invokeinterface #398,  4          // InterfaceMethod org/apache/logging/log4j/Logger.error:(Ljava/lang/String;Ljava/lang/Object;Ljava/lang/Object;)V
+      32: aconst_null
+      33: areturn
+      34: new           #2                  // class net/malisis/doors/DoorDescriptor
+      37: dup
+      38: invokespecial #399                // Method "<init>":()V
+      41: astore_1
+      42: aload_0
+      43: ldc           #202                // String name
+      45: invokevirtual #405                // Method java/util/HashMap.containsKey:(Ljava/lang/Object;)Z
+      48: ifeq          64
+      51: aload_1
+      52: aload_0
+      53: ldc           #202                // String name
+      55: invokevirtual #409                // Method java/util/HashMap.get:(Ljava/lang/Object;)Ljava/lang/Object;
+      58: checkcast     #411                // class java/lang/String
+      61: invokevirtual #141                // Method setRegistryName:(Ljava/lang/String;)V
+      64: aload_0
+      65: ldc           #211                // String modid
+      67: invokevirtual #405                // Method java/util/HashMap.containsKey:(Ljava/lang/Object;)Z
+      70: ifeq          104
+      73: aload_0
+      74: ldc           #212                // String textureName
+      76: invokevirtual #405                // Method java/util/HashMap.containsKey:(Ljava/lang/Object;)Z
+      79: ifeq          104
+      82: aload_1
+      83: aload_0
+      84: ldc           #211                // String modid
+      86: invokevirtual #409                // Method java/util/HashMap.get:(Ljava/lang/Object;)Ljava/lang/Object;
+      89: checkcast     #411                // class java/lang/String
+      92: aload_0
+      93: ldc           #212                // String textureName
+      95: invokevirtual #409                // Method java/util/HashMap.get:(Ljava/lang/Object;)Ljava/lang/Object;
+      98: checkcast     #411                // class java/lang/String
+     101: invokevirtual #413                // Method setTextureName:(Ljava/lang/String;Ljava/lang/String;)V
+     104: aload_0
+     105: ldc           #213                // String hardness
+     107: invokevirtual #405                // Method java/util/HashMap.containsKey:(Ljava/lang/Object;)Z
+     110: ifeq          126
+     113: aload_1
+     114: aload_0
+     115: ldc           #202                // String name
+     117: invokevirtual #409                // Method java/util/HashMap.get:(Ljava/lang/Object;)Ljava/lang/Object;
+     120: checkcast     #411                // class java/lang/String
+     123: invokevirtual #141                // Method setRegistryName:(Ljava/lang/String;)V
+     126: aload_0
+     127: ldc           #236                // String movement
+     129: invokevirtual #405                // Method java/util/HashMap.containsKey:(Ljava/lang/Object;)Z
+     132: ifeq          185
+     135: aload_0
+     136: ldc           #236                // String movement
+     138: invokevirtual #409                // Method java/util/HashMap.get:(Ljava/lang/Object;)Ljava/lang/Object;
+     141: checkcast     #411                // class java/lang/String
+     144: invokestatic  #239                // Method net/malisis/doors/DoorRegistry.getMovement:(Ljava/lang/String;)Lnet/malisis/doors/movement/IDoorMovement;
+     147: astore_2
+     148: aload_2
+     149: invokeinterface #418,  1          // InterfaceMethod net/malisis/doors/movement/IDoorMovement.isSpecial:()Z
+     154: ifeq          180
+     157: getstatic     #390                // Field net/malisis/core/MalisisCore.log:Lorg/apache/logging/log4j/Logger;
+     160: ldc_w         #420                // String {} is marked as 'special' and cannot be used for regular doors. Defaulting to 'rotating' movement
+     163: aload_0
+     164: ldc           #236                // String movement
+     166: invokevirtual #409                // Method java/util/HashMap.get:(Ljava/lang/Object;)Ljava/lang/Object;
+     169: invokeinterface #423,  3          // InterfaceMethod org/apache/logging/log4j/Logger.error:(Ljava/lang/String;Ljava/lang/Object;)V
+     174: ldc           #86                 // class net/malisis/doors/movement/RotatingDoorMovement
+     176: invokestatic  #92                 // Method net/malisis/doors/DoorRegistry.getMovement:(Ljava/lang/Class;)Lnet/malisis/doors/movement/IDoorMovement;
+     179: astore_2
+     180: aload_1
+     181: aload_2
+     182: invokevirtual #241                // Method setMovement:(Lnet/malisis/doors/movement/IDoorMovement;)V
+     185: aload_0
+     186: ldc           #242                // String sound
+     188: invokevirtual #405                // Method java/util/HashMap.containsKey:(Ljava/lang/Object;)Z
+     191: ifeq          210
+     194: aload_1
+     195: aload_0
+     196: ldc           #242                // String sound
+     198: invokevirtual #409                // Method java/util/HashMap.get:(Ljava/lang/Object;)Ljava/lang/Object;
+     201: checkcast     #411                // class java/lang/String
+     204: invokestatic  #245                // Method net/malisis/doors/DoorRegistry.getSound:(Ljava/lang/String;)Lnet/malisis/doors/sound/IDoorSound;
+     207: invokevirtual #247                // Method setSound:(Lnet/malisis/doors/sound/IDoorSound;)V
+     210: aload_0
+     211: ldc           #248                // String openingTime
+     213: invokevirtual #405                // Method java/util/HashMap.containsKey:(Ljava/lang/Object;)Z
+     216: ifeq          235
+     219: aload_1
+     220: aload_0
+     221: ldc           #248                // String openingTime
+     223: invokevirtual #409                // Method java/util/HashMap.get:(Ljava/lang/Object;)Ljava/lang/Object;
+     226: checkcast     #425                // class java/lang/Integer
+     229: invokevirtual #428                // Method java/lang/Integer.intValue:()I
+     232: invokevirtual #250                // Method setOpeningTime:(I)V
+     235: aload_0
+     236: ldc_w         #261                // String redstoneBehavior
+     239: invokevirtual #405                // Method java/util/HashMap.containsKey:(Ljava/lang/Object;)Z
+     242: ifeq          266
+     245: aload_1
+     246: invokestatic  #265                // Method net/malisis/doors/DoorDescriptor$RedstoneBehavior.values:()[Lnet/malisis/doors/DoorDescriptor$RedstoneBehavior;
+     249: aload_0
+     250: ldc_w         #261                // String redstoneBehavior
+     253: invokevirtual #409                // Method java/util/HashMap.get:(Ljava/lang/Object;)Ljava/lang/Object;
+     256: checkcast     #425                // class java/lang/Integer
+     259: invokevirtual #428                // Method java/lang/Integer.intValue:()I
+     262: aaload
+     263: invokevirtual #260                // Method setRedstoneBehavior:(Lnet/malisis/doors/DoorDescriptor$RedstoneBehavior;)V
+     266: aload_0
+     267: ldc_w         #266                // String doubleDoor
+     270: invokevirtual #405                // Method java/util/HashMap.containsKey:(Ljava/lang/Object;)Z
+     273: ifeq          293
+     276: aload_1
+     277: aload_0
+     278: ldc_w         #266                // String doubleDoor
+     281: invokevirtual #409                // Method java/util/HashMap.get:(Ljava/lang/Object;)Ljava/lang/Object;
+     284: checkcast     #430                // class java/lang/Boolean
+     287: invokevirtual #433                // Method java/lang/Boolean.booleanValue:()Z
+     290: invokevirtual #268                // Method setDoubleDoor:(Z)V
+     293: aload_0
+     294: ldc_w         #269                // String proximityDetection
+     297: invokevirtual #405                // Method java/util/HashMap.containsKey:(Ljava/lang/Object;)Z
+     300: ifeq          320
+     303: aload_1
+     304: aload_0
+     305: ldc_w         #269                // String proximityDetection
+     308: invokevirtual #409                // Method java/util/HashMap.get:(Ljava/lang/Object;)Ljava/lang/Object;
+     311: checkcast     #430                // class java/lang/Boolean
+     314: invokevirtual #433                // Method java/lang/Boolean.booleanValue:()Z
+     317: invokevirtual #271                // Method setProximityDetection:(Z)V
+     320: aload_0
+     321: ldc_w         #272                // String autoCloseTime
+     324: invokevirtual #405                // Method java/util/HashMap.containsKey:(Ljava/lang/Object;)Z
+     327: ifeq          347
+     330: aload_1
+     331: aload_0
+     332: ldc_w         #272                // String autoCloseTime
+     335: invokevirtual #409                // Method java/util/HashMap.get:(Ljava/lang/Object;)Ljava/lang/Object;
+     338: checkcast     #425                // class java/lang/Integer
+     341: invokevirtual #428                // Method java/lang/Integer.intValue:()I
+     344: invokevirtual #274                // Method setAutoCloseTime:(I)V
+     347: aload_0
+     348: ldc_w         #275                // String code
+     351: invokevirtual #405                // Method java/util/HashMap.containsKey:(Ljava/lang/Object;)Z
+     354: ifeq          371
+     357: aload_1
+     358: aload_0
+     359: ldc_w         #275                // String code
+     362: invokevirtual #409                // Method java/util/HashMap.get:(Ljava/lang/Object;)Ljava/lang/Object;
+     365: checkcast     #411                // class java/lang/String
+     368: invokevirtual #277                // Method setCode:(Ljava/lang/String;)V
+     371: aload_0
+     372: ldc_w         #434                // String tab
+     375: invokevirtual #405                // Method java/util/HashMap.containsKey:(Ljava/lang/Object;)Z
+     378: ifeq          395
+     381: aload_1
+     382: aload_0
+     383: ldc_w         #434                // String tab
+     386: invokevirtual #409                // Method java/util/HashMap.get:(Ljava/lang/Object;)Ljava/lang/Object;
+     389: checkcast     #436                // class net/minecraft/creativetab/CreativeTabs
+     392: invokevirtual #438                // Method setTab:(Lnet/minecraft/creativetab/CreativeTabs;)V
+     395: aload_1
+     396: invokevirtual #440                // Method register:()Lnet/malisis/doors/DoorDescriptor;
+     399: pop
+     400: aload_1
+     401: invokevirtual #442                // Method getBlock:()Lnet/minecraft/block/Block;
+     404: aload_1
+     405: invokevirtual #444                // Method getItem:()Lnet/minecraft/item/Item;
+     408: invokestatic  #450                // Method org/apache/commons/lang3/tuple/Pair.of:(Ljava/lang/Object;Ljava/lang/Object;)Lorg/apache/commons/lang3/tuple/Pair;
+     411: areturn
+}

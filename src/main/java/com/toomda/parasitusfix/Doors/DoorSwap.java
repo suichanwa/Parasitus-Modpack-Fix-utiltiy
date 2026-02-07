@@ -5,6 +5,9 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockDoor;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.init.Items;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
@@ -128,6 +131,35 @@ public class DoorSwap {
             replacePair(w, pos);
             processed++;
         }
+    }
+
+    @SubscribeEvent
+    public static void onHarvest(BlockEvent.HarvestDropsEvent e) {
+        if (e.getWorld().isRemote) return;
+
+        IBlockState state = e.getState();
+        Block block = state.getBlock();
+        Item srcItem = ParasitusDoors.MD2SRC_ITEM.get(block);
+        if (srcItem == null) return;
+
+        if (block instanceof BlockDoor && state.getPropertyKeys().contains(BlockDoor.HALF)) {
+            BlockDoor.EnumDoorHalf half = state.getValue(BlockDoor.HALF);
+            if (half == BlockDoor.EnumDoorHalf.UPPER) {
+                e.getDrops().clear();
+                return;
+            }
+        }
+
+        e.getDrops().clear();
+        Item mdItem = Item.getItemFromBlock(block);
+        if (mdItem != null && mdItem != Items.AIR) {
+            ResourceLocation mdId = mdItem.getRegistryName();
+            if (mdId != null && ParasitusFix.MODID.equals(mdId.getResourceDomain())) {
+                e.getDrops().add(new ItemStack(mdItem));
+                return;
+            }
+        }
+        e.getDrops().add(new ItemStack(srcItem));
     }
 
 

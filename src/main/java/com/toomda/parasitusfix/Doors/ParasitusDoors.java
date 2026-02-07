@@ -1,14 +1,19 @@
 package com.toomda.parasitusfix.Doors;
 
+import com.toomda.parasitusfix.ParasitusFix;
 import net.malisis.doors.DoorDescriptor;
 import net.minecraft.block.Block;
+import net.minecraft.init.Items;
+import net.minecraft.item.Item;
 import net.malisis.doors.DoorRegistry;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.fml.common.registry.ForgeRegistries;
 
 import java.util.*;
 
 public class ParasitusDoors {
     public static final Map<ResourceLocation, Block> SRC2MD_BLOCK = new HashMap<>();
+    public static final Map<Block, Item> MD2SRC_ITEM = new HashMap<>();
     public static class DoorSpec {
         public final ResourceLocation sourceId;
         public final String regPath;
@@ -74,6 +79,7 @@ public class ParasitusDoors {
         for (DoorSpec s : SPECS) {
             DoorDescriptor d = new DoorDescriptor();
             d.setName(s.regPath);
+            d.setRegistryName(ParasitusFix.MODID + ":" + s.regPath);
 
             d.setMovement(DoorRegistry.getMovement(s.movementId));
             d.setSound(DoorRegistry.getSound(s.soundId));
@@ -89,6 +95,12 @@ public class ParasitusDoors {
 
             Block mdBlock = d.getBlock();
             SRC2MD_BLOCK.put(s.sourceId, mdBlock);
+
+            Block srcBlock = ForgeRegistries.BLOCKS.getValue(s.sourceId);
+            Item srcItem = srcBlock != null ? Item.getItemFromBlock(srcBlock) : Items.AIR;
+            if (srcItem != null && srcItem != Items.AIR) {
+                MD2SRC_ITEM.put(mdBlock, srcItem);
+            }
         }
     }
 }
