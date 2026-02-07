@@ -12,6 +12,7 @@ import com.toomda.parasitusfix.sevendaystomine.SevenDaysBlockPatches;
 import com.toomda.parasitusfix.sevendaystomine.SevenDaysChanceConfigGuard;
 import com.toomda.parasitusfix.sevendaystomine.SevenDaysDamagePatches;
 import com.toomda.parasitusfix.sevendaystomine.ZombieSpawnFix;
+import com.toomda.parasitusfix.techguns.TechgunsZombieSoldierTargetFix;
 import net.minecraft.init.Blocks;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Loader;
@@ -53,6 +54,9 @@ public class ParasitusFix
             MinecraftForge.EVENT_BUS.register(new ZombieSpawnFix());
             MinecraftForge.EVENT_BUS.register(new BarbedWireDurabilityFix());
             MinecraftForge.EVENT_BUS.register(new EnchantItemFix());
+        }
+        if (Loader.isModLoaded("techguns")) {
+            MinecraftForge.EVENT_BUS.register(new TechgunsZombieSoldierTargetFix());
         }
         logger.info("DIRT BLOCK >> {}", Blocks.DIRT.getRegistryName());
     }
