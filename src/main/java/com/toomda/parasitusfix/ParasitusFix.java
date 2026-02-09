@@ -1,6 +1,7 @@
 package com.toomda.parasitusfix;
 
 import com.toomda.parasitusfix.Doors.ParasitusDoors;
+import com.toomda.parasitusfix.commands.ParasitusFixCommand;
 import com.toomda.parasitusfix.sevendaystomine.BandageInstantUse;
 import com.toomda.parasitusfix.sevendaystomine.BarbedWireDurabilityFix;
 import com.toomda.parasitusfix.sevendaystomine.BleedDamageLimiter;
@@ -26,6 +27,7 @@ import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 import org.apache.logging.log4j.Logger;
 
 @Mod(modid = ParasitusFix.MODID, name = ParasitusFix.NAME, version = ParasitusFix.VERSION, dependencies = "required-after:sevendaystomine")
@@ -82,8 +84,11 @@ public class ParasitusFix
         }
     }
 
-
-
+    @EventHandler
+    public void serverStarting(FMLServerStartingEvent event) {
+        event.registerServerCommand(new ParasitusFixCommand());
+        logger.info("ParasitusFix commands registered");
+    }
 }
 
 

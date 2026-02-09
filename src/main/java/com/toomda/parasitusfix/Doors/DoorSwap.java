@@ -6,22 +6,28 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockDoor;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
+import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.event.world.ChunkEvent;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent;
 
 import java.util.*;
 
 @Mod.EventBusSubscriber(modid = ParasitusFix.MODID)
 public class DoorSwap {
     private static final Map<World, Set<BlockPos>> PENDING = new HashMap<>();
+    private static final Map<UUID, Long> PLACEMENT_COOLDOWN = new HashMap<>();
+    private static final long COOLDOWN_TICKS = 5;
 
     private static Set<BlockPos> queue(World w) {
         return PENDING.computeIfAbsent(w, k -> new HashSet<>());
@@ -51,6 +57,48 @@ public class DoorSwap {
     }
 
     @SubscribeEvent
+    public static void onServerTick(TickEvent.ServerTickEvent e) {
+        if (e.phase == TickEvent.Phase.END) {
+            // Clean up old cooldowns
+            long currentTime = System.currentTimeMillis();
+            PLACEMENT_COOLDOWN.entrySet().removeIf(entry -> 
+                currentTime - entry.getValue() > 1000);
+        }
+    }
+
+    // Use RightClickBlock with high priority to intercept before placement
+    @SubscribeEvent(priority = EventPriority.HIGH)
+    public static void onRightClickBlock(PlayerInteractEvent.RightClickBlock e) {
+        if (!ParasitusFixConfig.DOORS.enablePlayerPlacementSwap) {
+            return;
+        }
+
+        World w = e.getWorld();
+        if (w.isRemote) return;
+
+        EntityPlayer player = e.getEntityPlayer();
+        ItemStack stack = player.getHeldItem(e.getHand());
+        if (stack.isEmpty()) return;
+
+        Item item = stack.getItem();
+        ResourceLocation itemId = item.getRegistryName();
+        if (itemId == null) return;
+
+        // Check if this is a PVJ door item that needs swapping
+        Block pvjDoor = Block.getBlockFromItem(item);
+        if (pvjDoor == null) return;
+
+        ResourceLocation blockId = pvjDoor.getRegistryName();
+        if (blockId == null) return;
+
+        Block replacement = ParasitusDoors.SRC2MD_BLOCK.get(blockId);
+        if (replacement == null) return;
+
+        PLACEMENT_COOLDOWN.put(player.getUniqueID(), w.getTotalWorldTime());
+    }
+
+    // Catch the actual placement with lower priority
+    @SubscribeEvent(priority = EventPriority.LOW)
     public static void onPlace(BlockEvent.EntityPlaceEvent e) {
         if (!ParasitusFixConfig.DOORS.enablePlayerPlacementSwap) {
             return;
@@ -59,6 +107,16 @@ public class DoorSwap {
         World w = e.getWorld();
         if (w.isRemote) return;
 
+        // Only process if placed by a player who just clicked
+        if (!(e.getEntity() instanceof EntityPlayer)) return;
+        EntityPlayer player = (EntityPlayer) e.getEntity();
+        
+        Long placementTime = PLACEMENT_COOLDOWN.get(player.getUniqueID());
+        if (placementTime == null) return;
+        
+        long timeSince = w.getTotalWorldTime() - placementTime;
+        if (timeSince > COOLDOWN_TICKS) return;
+
         Block block = e.getPlacedBlock().getBlock();
         ResourceLocation id = block.getRegistryName();
         if (id == null) return;
@@ -66,12 +124,12 @@ public class DoorSwap {
         Block replacement = ParasitusDoors.SRC2MD_BLOCK.get(id);
         if (replacement == null) return;
 
+        // Queue the replacement for next tick to let the door fully place
         queue(w).add(e.getPos());
     }
 
     @SubscribeEvent
     public static void onChunkLoad(ChunkEvent.Load e) {
-        // Only scan existing chunks if world replacement is enabled
         if (!ParasitusFixConfig.DOORS.enableWorldDoorReplacement) {
             return;
         }
@@ -94,7 +152,6 @@ public class DoorSwap {
 
     @SubscribeEvent
     public static void onPopulate(net.minecraftforge.event.terraingen.PopulateChunkEvent.Post e) {
-        // Only scan newly generated chunks if world replacement is enabled
         if (!ParasitusFixConfig.DOORS.enableWorldDoorReplacement) {
             return;
         }
@@ -118,8 +175,8 @@ public class DoorSwap {
     }
 
     @SubscribeEvent
-    public static void onWorldTick(net.minecraftforge.fml.common.gameevent.TickEvent.WorldTickEvent e) {
-        if (e.phase != net.minecraftforge.fml.common.gameevent.TickEvent.Phase.END) return;
+    public static void onWorldTick(TickEvent.WorldTickEvent e) {
+        if (e.phase != TickEvent.Phase.END) return;
         if (e.world.isRemote) return;
 
         Set<BlockPos> pending = queue(e.world);
@@ -140,7 +197,6 @@ public class DoorSwap {
 
     @SubscribeEvent
     public static void onHarvest(BlockEvent.HarvestDropsEvent e) {
-        // Check config before swapping drops
         if (!ParasitusFixConfig.DOORS.enableDropSwap) {
             return;
         }
@@ -180,6 +236,7 @@ public class DoorSwap {
         IBlockState newLower = replacement.getDefaultState();
         IBlockState newUpper = replacement.getDefaultState();
 
+        // Copy all compatible properties
         for (IProperty<?> prop : lowerState.getPropertyKeys()) {
             if (newLower.getPropertyKeys().contains(prop)) {
                 newLower = copyProperty(lowerState, newLower, prop);
@@ -192,8 +249,13 @@ public class DoorSwap {
             }
         }
 
+        // Use flag 2 (send to clients) + flag 1 (cause block update) = 3
         w.setBlockState(lower, newLower, 3);
         w.setBlockState(upper, newUpper, 3);
+        
+        // Notify neighbors to ensure proper state updates
+        w.notifyNeighborsOfStateChange(lower, replacement, false);
+        w.notifyNeighborsOfStateChange(upper, replacement, false);
     }
 
     @SuppressWarnings("unchecked")
