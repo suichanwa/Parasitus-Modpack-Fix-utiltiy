@@ -23,6 +23,18 @@ public final class QuartzKinesisPipeCapRemoval {
 
             maxPowerField.setAccessible(true);
             
+            boolean isStatic = Modifier.isStatic(maxPowerField.getModifiers());
+            Class<?> declaringClass = maxPowerField.getDeclaringClass();
+            
+            ParasitusFix.getLogger().info("Found field '{}' in class '{}' (static: {})", 
+                maxPowerField.getName(), declaringClass.getName(), isStatic);
+            
+            if (!declaringClass.getName().equals(PIPE_CLASS)) {
+                ParasitusFix.getLogger().warn("Field '{}' is declared in parent class '{}' - this would affect all pipes! Aborting.", 
+                    maxPowerField.getName(), declaringClass.getName());
+                return;
+            }
+            
             removeFinal(maxPowerField);
             
             int oldValue = maxPowerField.getInt(null);
