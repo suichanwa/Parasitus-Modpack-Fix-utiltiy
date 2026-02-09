@@ -17,6 +17,7 @@ import com.toomda.parasitusfix.techguns.TechgunsAttackHelicopterNoDespawn;
 import com.toomda.parasitusfix.techguns.TechgunsSoldierZombieTargetFix;
 import com.toomda.parasitusfix.techguns.TechgunsGrinderDurabilityFix;
 import com.toomda.parasitusfix.techguns.TechgunsBlockHardnessCap;
+import com.toomda.parasitusfix.buildcraft.QuartzKinesisPipeCapRemoval;
 import net.minecraft.init.Blocks;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Loader;
@@ -75,6 +76,9 @@ public class ParasitusFix
         if (Loader.isModLoaded("techguns")) {
             TechgunsBlockHardnessCap.apply();
             TechgunsGrinderDurabilityFix.apply();
+        }
+        if (Loader.isModLoaded("buildcrafttransport")) {
+            QuartzKinesisPipeCapRemoval.apply();
         }
     }
 

@@ -1,15 +1,13 @@
 package com.toomda.parasitusfix.Doors;
 
 import com.toomda.parasitusfix.ParasitusFix;
+import com.toomda.parasitusfix.config.ParasitusFixConfig;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockDoor;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -30,66 +28,91 @@ public class DoorSwap {
     }
 
     private static boolean bothHalvesLoaded(World w, BlockPos anyHalf) {
-        if (!w.isBlockLoaded(anyHalf)) return false;
-        IBlockState s = w.getBlockState(anyHalf);
-        if (!(s.getBlock() instanceof BlockDoor)) return false;
-        BlockPos bottom = (s.getValue(BlockDoor.HALF) == BlockDoor.EnumDoorHalf.UPPER) ? anyHalf.down() : anyHalf;
-        BlockPos top = bottom.up();
-        return w.isBlockLoaded(bottom) && w.isBlockLoaded(top)
-                && w.getBlockState(bottom).getBlock() instanceof BlockDoor
-                && w.getBlockState(top).getBlock()    instanceof BlockDoor;
+        IBlockState state = w.getBlockState(anyHalf);
+        if (!(state.getBlock() instanceof BlockDoor)) return false;
+
+        BlockDoor.EnumDoorHalf half = state.getValue(BlockDoor.HALF);
+        BlockPos other = half == BlockDoor.EnumDoorHalf.LOWER 
+            ? anyHalf.up() 
+            : anyHalf.down();
+
+        return w.isBlockLoaded(other);
     }
 
-
     private static boolean isSourceDoor(World w, BlockPos p) {
-        IBlockState s = w.getBlockState(p);
-        ResourceLocation id = Block.REGISTRY.getNameForObject(s.getBlock());
+        Block block = w.getBlockState(p).getBlock();
+        ResourceLocation id = block.getRegistryName();
         return id != null && ParasitusDoors.SRC2MD_BLOCK.containsKey(id);
     }
 
     @SubscribeEvent
     public static void onWorldUnload(net.minecraftforge.event.world.WorldEvent.Unload e) {
-        if (e.getWorld().isRemote) return;
         PENDING.remove(e.getWorld());
     }
 
-
-    @SuppressWarnings("deprecation")
     @SubscribeEvent
-    public static void onPlace(BlockEvent.PlaceEvent e) {
-        if (e.getWorld().isRemote) return;
-        World w = (World) e.getWorld();
-        BlockPos pos = e.getPos();
-        if (!isSourceDoor(w, pos)) return;
-        if (bothHalvesLoaded(w, pos)) replacePair(w, pos);
-        else queue(w).add(pos.toImmutable());
+    public static void onPlace(BlockEvent.EntityPlaceEvent e) {
+        if (!ParasitusFixConfig.DOORS.enablePlayerPlacementSwap) {
+            return;
+        }
+
+        World w = e.getWorld();
+        if (w.isRemote) return;
+
+        Block block = e.getPlacedBlock().getBlock();
+        ResourceLocation id = block.getRegistryName();
+        if (id == null) return;
+
+        Block replacement = ParasitusDoors.SRC2MD_BLOCK.get(id);
+        if (replacement == null) return;
+
+        queue(w).add(e.getPos());
     }
 
     @SubscribeEvent
     public static void onChunkLoad(ChunkEvent.Load e) {
-        if (e.getWorld().isRemote) return;
-        World w = e.getWorld();
-        Chunk c = e.getChunk();
+        // Only scan existing chunks if world replacement is enabled
+        if (!ParasitusFixConfig.DOORS.enableWorldDoorReplacement) {
+            return;
+        }
 
-        BlockPos.MutableBlockPos p = new BlockPos.MutableBlockPos();
-        for (int x=0;x<16;x++) for (int z=0;z<16;z++) for (int y=0;y<w.getHeight();y++) {
-            p.setPos((c.x<<4)+x, y, (c.z<<4)+z);
-            if (isSourceDoor(w, p)) queue(w).add(p.toImmutable());
+        World w = e.getWorld();
+        if (w.isRemote) return;
+
+        Chunk chunk = e.getChunk();
+        for (int x = 0; x < 16; x++) {
+            for (int z = 0; z < 16; z++) {
+                for (int y = 0; y < 256; y++) {
+                    BlockPos pos = new BlockPos(chunk.x * 16 + x, y, chunk.z * 16 + z);
+                    if (isSourceDoor(w, pos)) {
+                        queue(w).add(pos);
+                    }
+                }
+            }
         }
     }
 
-    @net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+    @SubscribeEvent
     public static void onPopulate(net.minecraftforge.event.terraingen.PopulateChunkEvent.Post e) {
+        // Only scan newly generated chunks if world replacement is enabled
+        if (!ParasitusFixConfig.DOORS.enableWorldDoorReplacement) {
+            return;
+        }
+
         World w = e.getWorld();
         if (w.isRemote) return;
-        int cx = e.getChunkX();
-        int cz = e.getChunkZ();
 
-        BlockPos.MutableBlockPos p = new BlockPos.MutableBlockPos();
-        for (int x=0;x<16;x++) for (int z=0;z<16;z++) {
-            for (int y=0;y<w.getHeight();y++) {
-                p.setPos((cx<<4)+x, y, (cz<<4)+z);
-                if (isSourceDoor(w, p)) queue(w).add(p.toImmutable());
+        int chunkX = e.getChunkX() * 16;
+        int chunkZ = e.getChunkZ() * 16;
+
+        for (int x = 0; x < 16; x++) {
+            for (int z = 0; z < 16; z++) {
+                for (int y = 0; y < 256; y++) {
+                    BlockPos pos = new BlockPos(chunkX + x, y, chunkZ + z);
+                    if (isSourceDoor(w, pos)) {
+                        queue(w).add(pos);
+                    }
+                }
             }
         }
     }
@@ -97,238 +120,86 @@ public class DoorSwap {
     @SubscribeEvent
     public static void onWorldTick(net.minecraftforge.fml.common.gameevent.TickEvent.WorldTickEvent e) {
         if (e.phase != net.minecraftforge.fml.common.gameevent.TickEvent.Phase.END) return;
-        World w = e.world;
-        if (w.isRemote) return;
+        if (e.world.isRemote) return;
 
-        Set<BlockPos> q = PENDING.get(w);
-        if (q == null || q.isEmpty()) return;
+        Set<BlockPos> pending = queue(e.world);
+        if (pending.isEmpty()) return;
 
-        final int budget = 512;
-
-        // Take a snapshot and clear the live set.
-        // Any new adds during replacePair() will go into q safely.
-        List<BlockPos> snapshot = new ArrayList<>(q);
-        q.clear();
-
+        Iterator<BlockPos> it = pending.iterator();
         int processed = 0;
-        for (BlockPos pos : snapshot) {
-            if (processed >= budget) {
-                // not processed yet -> keep for next tick
-                q.add(pos);
-                continue;
+        while (it.hasNext() && processed < 50) {
+            BlockPos pos = it.next();
+            it.remove();
+
+            if (bothHalvesLoaded(e.world, pos) && isSourceDoor(e.world, pos)) {
+                replacePair(e.world, pos);
             }
-
-            // If it's no longer a source door, drop it
-            if (!isSourceDoor(w, pos)) continue;
-
-            // If the other half isn't loaded yet, re-queue it
-            if (!bothHalvesLoaded(w, pos)) {
-                q.add(pos);
-                continue;
-            }
-
-            // Do the swap
-            replacePair(w, pos);
             processed++;
         }
     }
 
     @SubscribeEvent
     public static void onHarvest(BlockEvent.HarvestDropsEvent e) {
-        if (e.getWorld().isRemote) return;
-
-        IBlockState state = e.getState();
-        Block block = state.getBlock();
-        Item srcItem = ParasitusDoors.MD2SRC_ITEM.get(block);
-        if (srcItem == null) return;
-
-        if (block instanceof BlockDoor && state.getPropertyKeys().contains(BlockDoor.HALF)) {
-            BlockDoor.EnumDoorHalf half = state.getValue(BlockDoor.HALF);
-            if (half == BlockDoor.EnumDoorHalf.UPPER) {
-                e.getDrops().clear();
-                return;
-            }
+        // Check config before swapping drops
+        if (!ParasitusFixConfig.DOORS.enableDropSwap) {
+            return;
         }
+
+        World w = e.getWorld();
+        if (w.isRemote) return;
+
+        Block block = e.getState().getBlock();
+        Item correctItem = ParasitusDoors.MD2SRC_ITEM.get(block);
+        if (correctItem == null) return;
 
         e.getDrops().clear();
-        Item mdItem = Item.getItemFromBlock(block);
-        if (mdItem != null && mdItem != Items.AIR) {
-            ResourceLocation mdId = mdItem.getRegistryName();
-            if (mdId != null && ParasitusFix.MODID.equals(mdId.getResourceDomain())) {
-                e.getDrops().add(new ItemStack(mdItem));
-                return;
-            }
-        }
-        e.getDrops().add(new ItemStack(srcItem));
+        e.getDrops().add(new ItemStack(correctItem, 1));
     }
-
 
     private static void replacePair(World w, BlockPos anyHalf) {
-        BlockPos top = anyHalf;
-        BlockPos bottom = anyHalf;
-        IBlockState s = w.getBlockState(anyHalf);
-        if (s.getValue(BlockDoor.HALF) == BlockDoor.EnumDoorHalf.UPPER) bottom = anyHalf.down();
-        else top = anyHalf.up();
+        IBlockState state = w.getBlockState(anyHalf);
+        Block srcBlock = state.getBlock();
+        
+        ResourceLocation srcId = srcBlock.getRegistryName();
+        if (srcId == null) return;
 
-        IBlockState srcBottom = w.getBlockState(bottom);
-        ResourceLocation srcId = Block.REGISTRY.getNameForObject(srcBottom.getBlock());
-        Block mdBlock = ParasitusDoors.SRC2MD_BLOCK.get(srcId);
-        if (mdBlock == null) return;
+        Block replacement = ParasitusDoors.SRC2MD_BLOCK.get(srcId);
+        if (replacement == null) return;
 
-        if (w.getBlockState(bottom).getBlock() == mdBlock || w.getBlockState(top).getBlock() == mdBlock) return;
+        BlockDoor.EnumDoorHalf half = state.getValue(BlockDoor.HALF);
+        BlockPos lower = half == BlockDoor.EnumDoorHalf.LOWER ? anyHalf : anyHalf.down();
+        BlockPos upper = lower.up();
 
-        EnumFacing facing = getFacingFrom(srcBottom);
-        BlockDoor.EnumHingePosition hinge = computeHinge(w, bottom, facing, mdBlock);
+        IBlockState lowerState = w.getBlockState(lower);
+        IBlockState upperState = w.getBlockState(upper);
 
-        IBlockState mdBottom = mapStateToMd(w, bottom, mdBlock, mdBlock.getDefaultState(), w.getBlockState(bottom), false, hinge);
-        IBlockState mdTop    = mapStateToMd(w, bottom, mdBlock, mdBlock.getDefaultState(), w.getBlockState(top),    true,  hinge);
-
-        final int SILENT = 2 | 16;
-        w.setBlockState(bottom, mdBottom, SILENT);
-        w.setBlockState(top,    mdTop,    SILENT);
-
-        TileEntity te = w.getTileEntity(bottom);
-        if (te instanceof net.malisis.doors.tileentity.DoorTileEntity) {
-            net.malisis.doors.tileentity.DoorTileEntity dte = (net.malisis.doors.tileentity.DoorTileEntity) te;
-            dte.setCentered(false);
-            boolean isOpen = srcBottom.getValue(BlockDoor.OPEN);
-            dte.setDoorState(isOpen ? net.malisis.doors.DoorState.OPENED : net.malisis.doors.DoorState.CLOSED);
-            dte.updatePowered();
-            dte.markDirty();
+        if (lowerState.getBlock() != srcBlock || upperState.getBlock() != srcBlock) {
+            return;
         }
 
-        w.notifyNeighborsOfStateChange(bottom, mdBlock, false);
-        w.notifyNeighborsOfStateChange(top,    mdBlock, false);
-    }
+        IBlockState newLower = replacement.getDefaultState();
+        IBlockState newUpper = replacement.getDefaultState();
 
-    private static IBlockState copyPropIfPresent(IBlockState from, IBlockState to, String name) {
-        IProperty<?> pFrom = getPropertyByName(from, name);
-        IProperty<?> pTo   = getPropertyByName(to, name);
-        if (pFrom == null || pTo == null) return to;
-        if (!pFrom.getValueClass().equals(pTo.getValueClass())) return to;
-        return copyPropUnchecked(from, to, pFrom, pTo);
-    }
-
-    private static IBlockState mapStateToMd(
-            World w, BlockPos lowerPos, Block mdBlock,
-            IBlockState mdDefault, IBlockState src, boolean upper,
-            BlockDoor.EnumHingePosition hinge) {
-        IBlockState md = mdDefault;
-
-        md = copyPropIfPresent(src, md, "facing");
-        md = copyPropIfPresent(src, md, "open");
-
-        md = copyPropIfPresent(src, md, "half");
-        for (IProperty<?> p : md.getPropertyKeys()) {
-            if (p.getName().equals("half") || p.getName().equals("part")) {
-                md = applyHalfProp(md, p, upper);
+        for (IProperty<?> prop : lowerState.getPropertyKeys()) {
+            if (newLower.getPropertyKeys().contains(prop)) {
+                newLower = copyProperty(lowerState, newLower, prop);
             }
         }
 
-        md = setHinge(md, hinge);
-        return md;
-    }
+        for (IProperty<?> prop : upperState.getPropertyKeys()) {
+            if (newUpper.getPropertyKeys().contains(prop)) {
+                newUpper = copyProperty(upperState, newUpper, prop);
+            }
+        }
 
-    private static IBlockState applyHalfProp(IBlockState state, IProperty<?> prop, boolean upper) {
-        if (!Comparable.class.isAssignableFrom(prop.getValueClass())) return state;
-        return applyHalfPropUnchecked(state, prop, upper);
+        w.setBlockState(lower, newLower, 3);
+        w.setBlockState(upper, newUpper, 3);
     }
 
     @SuppressWarnings("unchecked")
-    private static <T extends Comparable<T>> IBlockState applyHalfPropUnchecked(
-            IBlockState state,
-            IProperty<?> rawProp,
-            boolean upper
-    ) {
-        IProperty<T> prop = (IProperty<T>) rawProp;
-        for (T val : prop.getAllowedValues()) {
-            String n = String.valueOf(val).toLowerCase();
-            boolean isUpper = n.contains("upper") || n.contains("top");
-            boolean isLower = n.contains("lower") || n.contains("bottom");
-            if ((upper && isUpper) || (!upper && isLower)) {
-                return state.withProperty(prop, val);
-            }
-        }
-        return state;
+    private static <T extends Comparable<T>> IBlockState copyProperty(
+            IBlockState from, IBlockState to, IProperty<?> prop) {
+        IProperty<T> p = (IProperty<T>) prop;
+        return to.withProperty(p, from.getValue(p));
     }
-
-    private static IProperty<?> getPropertyByName(IBlockState state, String name) {
-        for (IProperty<?> p : state.getPropertyKeys()) {
-            if (p.getName().equals(name)) {
-                return p;
-            }
-        }
-        return null;
-    }
-
-    @SuppressWarnings("unchecked")
-    private static <T extends Comparable<T>> IBlockState copyPropUnchecked(
-            IBlockState from,
-            IBlockState to,
-            IProperty<?> rawFrom,
-            IProperty<?> rawTo
-    ) {
-        IProperty<T> pFrom = (IProperty<T>) rawFrom;
-        IProperty<T> pTo = (IProperty<T>) rawTo;
-        return to.withProperty(pTo, from.getValue(pFrom));
-    }
-
-    private static BlockDoor.EnumHingePosition computeHinge(World w, BlockPos lowerPos, EnumFacing facing, Block mdBlock) {
-        IBlockState left = w.getBlockState(leftOf(lowerPos, facing));
-        if (isSameMdDoor(left.getBlock(), mdBlock) && sameFacing(left, facing)) {
-            return BlockDoor.EnumHingePosition.RIGHT;
-        }
-
-        IBlockState right = w.getBlockState(rightOf(lowerPos, facing));
-        if (isSameMdDoor(right.getBlock(), mdBlock) && sameFacing(right, facing)) {
-            return BlockDoor.EnumHingePosition.LEFT;
-        }
-        return BlockDoor.EnumHingePosition.LEFT;
-    }
-
-    private static boolean sameFacing(IBlockState st, EnumFacing facing) {
-        IProperty<EnumFacing> p = getFacingProperty(st);
-        return p != null && facing == st.getValue(p);
-    }
-
-
-    private static EnumFacing getFacingFrom(IBlockState src) {
-        IProperty<EnumFacing> p = getFacingProperty(src);
-        if (p != null) return src.getValue(p);
-        return EnumFacing.NORTH;
-    }
-
-    @SuppressWarnings("unchecked")
-    private static IProperty<EnumFacing> getFacingProperty(IBlockState state) {
-        for (IProperty<?> p : state.getPropertyKeys()) {
-            if (p.getName().equals("facing") && EnumFacing.class.isAssignableFrom(p.getValueClass())) {
-                return (IProperty<EnumFacing>) p;
-            }
-        }
-        return null;
-    }
-
-    private static IBlockState setHinge(IBlockState state, BlockDoor.EnumHingePosition hinge) {
-        for (IProperty<?> p : state.getPropertyKeys()) {
-            if (p.getName().equals("hinge") && p.getValueClass() == BlockDoor.EnumHingePosition.class) {
-                @SuppressWarnings("unchecked")
-                IProperty<BlockDoor.EnumHingePosition> hp = (IProperty<BlockDoor.EnumHingePosition>) p;
-                return state.withProperty(hp, hinge);
-            }
-        }
-        return state;
-    }
-
-    private static BlockPos rightOf(BlockPos pos, EnumFacing facing) {
-        return pos.offset(facing.rotateY());
-    }
-
-    private static BlockPos leftOf(BlockPos pos, EnumFacing facing) {
-        return pos.offset(facing.rotateYCCW());
-    }
-
-    private static boolean isSameMdDoor(Block b, Block mdBlock) {
-        return b == mdBlock;
-    }
-
 }
