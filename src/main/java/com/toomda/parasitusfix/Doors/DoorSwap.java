@@ -107,7 +107,6 @@ public class DoorSwap {
         World w = e.getWorld();
         if (w.isRemote) return;
 
-        // Only process if placed by a player who just clicked
         if (!(e.getEntity() instanceof EntityPlayer)) return;
         EntityPlayer player = (EntityPlayer) e.getEntity();
         
@@ -124,7 +123,6 @@ public class DoorSwap {
         Block replacement = ParasitusDoors.SRC2MD_BLOCK.get(id);
         if (replacement == null) return;
 
-        // Queue the replacement for next tick to let the door fully place
         queue(w).add(e.getPos());
     }
 

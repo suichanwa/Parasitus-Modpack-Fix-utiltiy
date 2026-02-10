@@ -9,6 +9,7 @@ import com.toomda.parasitusfix.sevendaystomine.BleedEffectClamp;
 import com.toomda.parasitusfix.sevendaystomine.BleedingTamer;
 import com.toomda.parasitusfix.sevendaystomine.CrawlerArmorFix;
 import com.toomda.parasitusfix.sevendaystomine.EnchantItemFix;
+import com.toomda.parasitusfix.sevendaystomine.FlamethrowerTrapFuelSwap;
 import com.toomda.parasitusfix.sevendaystomine.SevenDaysBlockPatches;
 import com.toomda.parasitusfix.sevendaystomine.SevenDaysChanceConfigGuard;
 import com.toomda.parasitusfix.sevendaystomine.SevenDaysDamagePatches;
@@ -69,6 +70,10 @@ public class ParasitusFix
             MinecraftForge.EVENT_BUS.register(new BandageInstantUse());
             MinecraftForge.EVENT_BUS.register(new BarbedWireDurabilityFix());
             MinecraftForge.EVENT_BUS.register(new EnchantItemFix());
+            if (Loader.isModLoaded("buildcraftenergy")) {
+                MinecraftForge.EVENT_BUS.register(new FlamethrowerTrapFuelSwap());
+                logger.info("Flamethrower trap accepts BuildCraft heavy oil (cool)");
+            }
         }
         if (Loader.isModLoaded("techguns")) {
             MinecraftForge.EVENT_BUS.register(new TechgunsAttackHelicopterTargetFix());
@@ -133,4 +138,3 @@ public class ParasitusFix
         }
     }
 }
-
