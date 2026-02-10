@@ -13,6 +13,7 @@ import com.toomda.parasitusfix.sevendaystomine.FlamethrowerTrapFuelSwap;
 import com.toomda.parasitusfix.sevendaystomine.SevenDaysBlockPatches;
 import com.toomda.parasitusfix.sevendaystomine.SevenDaysChanceConfigGuard;
 import com.toomda.parasitusfix.sevendaystomine.SevenDaysDamagePatches;
+import com.toomda.parasitusfix.sevendaystomine.SevenDaysZombieEndSpawnRestrict;
 import com.toomda.parasitusfix.techguns.TechgunsAttackHelicopterTargetFix;
 import com.toomda.parasitusfix.techguns.TechgunsAttackHelicopterNoDespawn;
 import com.toomda.parasitusfix.techguns.TechgunsSoldierZombieTargetFix;
@@ -70,6 +71,7 @@ public class ParasitusFix
             MinecraftForge.EVENT_BUS.register(new BandageInstantUse());
             MinecraftForge.EVENT_BUS.register(new BarbedWireDurabilityFix());
             MinecraftForge.EVENT_BUS.register(new EnchantItemFix());
+            MinecraftForge.EVENT_BUS.register(new SevenDaysZombieEndSpawnRestrict());
             if (Loader.isModLoaded("buildcraftenergy")) {
                 MinecraftForge.EVENT_BUS.register(new FlamethrowerTrapFuelSwap());
                 logger.info("Flamethrower trap accepts BuildCraft heavy oil (cool)");
