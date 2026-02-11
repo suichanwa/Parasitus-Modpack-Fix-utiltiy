@@ -72,7 +72,6 @@ public class ParasitusFix
             MinecraftForge.EVENT_BUS.register(new BandageInstantUse());
             MinecraftForge.EVENT_BUS.register(new BarbedWireDurabilityFix());
             MinecraftForge.EVENT_BUS.register(new EnchantItemFix());
-            MinecraftForge.EVENT_BUS.register(new SevenDaysCoalBurnTimeFix());
             MinecraftForge.EVENT_BUS.register(new SevenDaysZombieEndSpawnRestrict());
             if (Loader.isModLoaded("buildcraftenergy")) {
                 MinecraftForge.EVENT_BUS.register(new FlamethrowerTrapFuelSwap());
@@ -90,6 +89,10 @@ public class ParasitusFix
 
     @EventHandler
     public void postInit(FMLPostInitializationEvent event) {
+        if (Loader.isModLoaded("sevendaystomine")) {
+            // Register after most mods finish init so our LOWEST fuel override wins.
+            MinecraftForge.EVENT_BUS.register(new SevenDaysCoalBurnTimeFix());
+        }
         SevenDaysChanceConfigGuard.apply();
         SevenDaysDamagePatches.apply();
         SevenDaysBlockPatches.apply();

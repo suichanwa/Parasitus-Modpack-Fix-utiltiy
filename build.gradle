@@ -75,6 +75,8 @@ dependencies {
     compile files('libs/ProjectVibrantJourneys-1.12.2-1.6.4.jar')
     compile files('libs/malisiscore-1.12.2-6.5.1.jar')
     compile files('libs/buildcraft-all-8.0.0.jar')
+    compile files('libs/OverLast-1.12.2-0.2.9B9.jar')
+    compile files('libs/superior-trees.jar')
 }
 
 configurations.all {
