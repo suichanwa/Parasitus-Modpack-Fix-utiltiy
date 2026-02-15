@@ -11,15 +11,13 @@ public class ParasitusDoors {
 
     public static class DoorSpec {
         public final String regPath;
-        public final String texMod;
         public final String texBase;
         public final String movementId;
         public final String soundId;
 
-        public DoorSpec(String regPath, String texMod, String texBase,
+        public DoorSpec(String regPath, String texBase,
                         String movementId, String soundId) {
             this.regPath = regPath;
-            this.texMod = texMod;
             this.texBase = texBase;
             this.movementId = movementId;
             this.soundId = soundId;
@@ -27,33 +25,33 @@ public class ParasitusDoors {
     }
 
     private static final List<DoorSpec> SPECS = Arrays.asList(
-            new DoorSpec("door_bunker", "parasitusfix", "bunker_door",
+            new DoorSpec("door_bunker", "bunker_door",
                     "rotating_door", "vanilla_door"),
-            new DoorSpec("door_fir", "parasitusfix", "door_fir",
+            new DoorSpec("door_fir", "door_fir",
                     "rotating_door", "vanilla_door"),
-            new DoorSpec("door_pine", "parasitusfix", "door_pine",
+            new DoorSpec("door_pine", "door_pine",
                     "rotating_door", "vanilla_door"),
-            new DoorSpec("door_palm", "parasitusfix", "door_palm",
+            new DoorSpec("door_palm", "door_palm",
                     "rotating_door", "vanilla_door"),
-            new DoorSpec("door_willow", "parasitusfix", "door_willow",
+            new DoorSpec("door_willow", "door_willow",
                     "rotating_door", "vanilla_door"),
-            new DoorSpec("door_mangrove", "parasitusfix", "door_mangrove",
+            new DoorSpec("door_mangrove", "door_mangrove",
                     "rotating_door", "vanilla_door"),
-            new DoorSpec("door_redwood", "parasitusfix", "door_redwood",
+            new DoorSpec("door_redwood", "door_redwood",
                     "rotating_door", "vanilla_door"),
-            new DoorSpec("door_baobab", "parasitusfix", "door_baobab",
+            new DoorSpec("door_baobab", "door_baobab",
                     "rotating_door", "vanilla_door"),
-            new DoorSpec("door_cottonwood", "parasitusfix", "door_cottonwood",
+            new DoorSpec("door_cottonwood", "door_cottonwood",
                     "rotating_door", "vanilla_door"),
-            new DoorSpec("door_aspen", "parasitusfix", "door_aspen",
+            new DoorSpec("door_aspen", "door_aspen",
                     "rotating_door", "vanilla_door"),
-            new DoorSpec("door_maple", "parasitusfix", "door_maple",
+            new DoorSpec("door_maple", "door_maple",
                     "rotating_door", "vanilla_door"),
-            new DoorSpec("door_juniper", "parasitusfix", "door_juniper",
+            new DoorSpec("door_juniper", "door_juniper",
                     "rotating_door", "vanilla_door"),
-            new DoorSpec("door_cherry_blossom", "parasitusfix", "door_cherry_blossom",
+            new DoorSpec("door_cherry_blossom", "door_cherry_blossom",
                                  "rotating_door", "vanilla_door"),
-            new DoorSpec("door_jacaranda", "parasitusfix", "door_jacaranda",
+            new DoorSpec("door_jacaranda", "door_jacaranda",
                     "rotating_door", "vanilla_door")
     );
 
@@ -67,6 +65,7 @@ public class ParasitusDoors {
             DoorDescriptor d = new DoorDescriptor();
             d.setName(s.regPath);
             d.setRegistryName(ParasitusFix.MODID + ":" + s.regPath);
+            d.setUnlocalizedName(s.texBase);
 
             d.setMovement(DoorRegistry.getMovement(s.movementId));
             d.setSound(DoorRegistry.getSound(s.soundId));
@@ -75,7 +74,7 @@ public class ParasitusDoors {
             d.setProximityDetection(false);
             d.setRedstoneBehavior(DoorDescriptor.RedstoneBehavior.STANDARD);
 
-            d.setTextureName(s.texMod, s.texBase);
+            d.setTextureName(ParasitusFix.MODID, s.texBase);
 
             d.create();
             d.register();

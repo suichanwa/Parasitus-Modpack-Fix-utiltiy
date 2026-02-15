@@ -58,6 +58,12 @@ public class ParasitusFix
     public void preInit(FMLPreInitializationEvent event)
     {
         logger = event.getModLog();
+        if (Loader.isModLoaded("malisisdoors")) {
+            ParasitusDoors.registerAll();
+            logger.info("Registered Parasitus custom doors (MalisisDoors detected).");
+        } else {
+            logger.info("Skipped Parasitus custom doors: MalisisDoors not loaded.");
+        }
         if (Loader.isModLoaded("buildcrafttransport") || Loader.isModLoaded("bcoreprocessing")) {
             MoltenMetalFluids.apply();
         }
@@ -86,7 +92,6 @@ public class ParasitusFix
             MinecraftForge.EVENT_BUS.register(new TechgunsAttackHelicopterNoDespawn());
             MinecraftForge.EVENT_BUS.register(new TechgunsSoldierZombieTargetFix());
             MinecraftForge.EVENT_BUS.register(new TechgunsZombieEndSpawnRestrict());
-            ParasitusDoors.registerAll();
         }
         logger.info("DIRT BLOCK >> {}", Blocks.DIRT.getRegistryName());
     }
