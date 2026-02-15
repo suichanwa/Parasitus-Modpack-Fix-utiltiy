@@ -6,9 +6,6 @@ import net.minecraftforge.common.config.Config;
 @Config(modid = ParasitusFix.MODID)
 public final class ParasitusFixConfig {
 
-    @Config.Name("Doors")
-    public static final Doors DOORS = new Doors();
-
     @Config.Name("7DTM Tools")
     public static final SevenDaysTools TOOLS = new SevenDaysTools();
 
@@ -58,30 +55,6 @@ public final class ParasitusFixConfig {
 
         @Config.Comment("Bronze sword base damage")
         public float bronzeSwordDamage = 5.5F;
-    }
-
-    public static final class Doors {
-        @Config.Comment({
-            "Enable automatic scanning and replacement of existing doors in loaded chunks.",
-            "FALSE = Existing doors in world are never touched (safe for existing structures)",
-            "TRUE = PVJ and Techguns bunker doors will be replaced with MalisisDoors when chunks load"
-        })
-        @Config.RequiresMcRestart
-        public boolean enableWorldDoorReplacement = false;
-
-        @Config.Comment({
-            "Enable door replacement when players place PVJ/Techguns bunker doors.",
-            "TRUE = Newly placed source doors will automatically become MalisisDoors",
-            "FALSE = Doors remain as originally placed"
-        })
-        public boolean enablePlayerPlacementSwap = true;
-
-        @Config.Comment({
-            "Enable corrected item drops when MalisisDoors are broken.",
-            "TRUE = Breaking a MalisisDoor drops the original source door item",
-            "FALSE = Normal drop behavior"
-        })
-        public boolean enableDropSwap = true;
     }
 
     public static final class Bleeding {

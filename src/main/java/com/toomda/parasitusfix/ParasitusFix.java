@@ -18,6 +18,7 @@ import com.toomda.parasitusfix.techguns.TechgunsAttackHelicopterNoDespawn;
 import com.toomda.parasitusfix.techguns.TechgunsSoldierZombieTargetFix;
 import com.toomda.parasitusfix.techguns.TechgunsGrinderDurabilityFix;
 import com.toomda.parasitusfix.techguns.TechgunsBlockHardnessCap;
+import com.toomda.parasitusfix.Doors.ParasitusDoors;
 import com.toomda.parasitusfix.buildcraft.QuartzKinesisPipeCapRemoval;
 import net.minecraft.entity.Entity;
 import net.minecraft.init.Blocks;
@@ -80,6 +81,7 @@ public class ParasitusFix
             MinecraftForge.EVENT_BUS.register(new TechgunsAttackHelicopterNoDespawn());
             MinecraftForge.EVENT_BUS.register(new TechgunsSoldierZombieTargetFix());
             MinecraftForge.EVENT_BUS.register(new TechgunsZombieEndSpawnRestrict());
+            ParasitusDoors.registerAll();
         }
         logger.info("DIRT BLOCK >> {}", Blocks.DIRT.getRegistryName());
     }
