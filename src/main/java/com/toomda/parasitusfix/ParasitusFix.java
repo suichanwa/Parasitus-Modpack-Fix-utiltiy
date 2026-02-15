@@ -1,6 +1,7 @@
 package com.toomda.parasitusfix;
 
 import com.toomda.parasitusfix.commands.ParasitusFixCommand;
+import com.toomda.parasitusfix.general.MoltenMetalFluids;
 import com.toomda.parasitusfix.sevendaystomine.BandageInstantUse;
 import com.toomda.parasitusfix.sevendaystomine.BarbedWireDurabilityFix;
 import com.toomda.parasitusfix.sevendaystomine.BleedDamageLimiter;
@@ -99,6 +100,7 @@ public class ParasitusFix
         }
         if (Loader.isModLoaded("buildcrafttransport")) {
             QuartzKinesisPipeCapRemoval.apply();
+            MoltenMetalFluids.apply();
         }
     }
 
