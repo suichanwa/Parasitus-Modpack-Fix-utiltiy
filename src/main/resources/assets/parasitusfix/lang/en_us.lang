@@ -26,3 +26,48 @@ item.door_cherry_blossom.name=Cherry Blossom Door
 tile.door_cherry_blossom.name=Cherry Blossom Door
 item.door_jacaranda.name=Jacaranda Door
 tile.door_jacaranda.name=Jacaranda Door
+
+# Molten Fluids
+fluid.molten_steel.cool=Molten Steel (Cool)
+fluid.molten_steel.hot=Molten Steel (Hot)
+fluid.molten_steel.searing=Molten Steel (Searing)
+
+fluid.molten_copper.cool=Molten Copper (Cool)
+fluid.molten_copper.hot=Molten Copper (Hot)
+fluid.molten_copper.searing=Molten Copper (Searing)
+
+fluid.molten_tin.cool=Molten Tin (Cool)
+fluid.molten_tin.hot=Molten Tin (Hot)
+fluid.molten_tin.searing=Molten Tin (Searing)
+
+fluid.molten_bronze.cool=Molten Bronze (Cool)
+fluid.molten_bronze.hot=Molten Bronze (Hot)
+fluid.molten_bronze.searing=Molten Bronze (Searing)
+
+fluid.molten_brass.cool=Molten Brass (Cool)
+fluid.molten_brass.hot=Molten Brass (Hot)
+fluid.molten_brass.searing=Molten Brass (Searing)
+
+fluid.molten_lead.cool=Molten Lead (Cool)
+fluid.molten_lead.hot=Molten Lead (Hot)
+fluid.molten_lead.searing=Molten Lead (Searing)
+
+fluid.molten_zinc.cool=Molten Zinc (Cool)
+fluid.molten_zinc.hot=Molten Zinc (Hot)
+fluid.molten_zinc.searing=Molten Zinc (Searing)
+
+fluid.molten_obsidian_steel.cool=Molten Obsidian Steel (Cool)
+fluid.molten_obsidian_steel.hot=Molten Obsidian Steel (Hot)
+fluid.molten_obsidian_steel.searing=Molten Obsidian Steel (Searing)
+
+fluid.molten_titanium.cool=Molten Titanium (Cool)
+fluid.molten_titanium.hot=Molten Titanium (Hot)
+fluid.molten_titanium.searing=Molten Titanium (Searing)
+
+fluid.molten_diamond_steel.cool=Molten Diamond Steel (Cool)
+fluid.molten_diamond_steel.hot=Molten Diamond Steel (Hot)
+fluid.molten_diamond_steel.searing=Molten Diamond Steel (Searing)
+
+fluid.molten_uranium.cool=Molten Uranium (Cool)
+fluid.molten_uranium.hot=Molten Uranium (Hot)
+fluid.molten_uranium.searing=Molten Uranium (Searing)

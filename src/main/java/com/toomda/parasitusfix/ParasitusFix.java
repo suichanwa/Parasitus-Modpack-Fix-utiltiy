@@ -20,6 +20,7 @@ import com.toomda.parasitusfix.techguns.TechgunsSoldierZombieTargetFix;
 import com.toomda.parasitusfix.techguns.TechgunsGrinderDurabilityFix;
 import com.toomda.parasitusfix.techguns.TechgunsBlockHardnessCap;
 import com.toomda.parasitusfix.Doors.ParasitusDoors;
+import com.toomda.parasitusfix.buildcraft.BuildCraftOreProcessing;
 import com.toomda.parasitusfix.buildcraft.QuartzKinesisPipeCapRemoval;
 import net.minecraft.entity.Entity;
 import net.minecraft.init.Blocks;
@@ -57,6 +58,9 @@ public class ParasitusFix
     public void preInit(FMLPreInitializationEvent event)
     {
         logger = event.getModLog();
+        if (Loader.isModLoaded("buildcrafttransport") || Loader.isModLoaded("bcoreprocessing")) {
+            MoltenMetalFluids.apply();
+        }
     }
 
     @EventHandler
@@ -100,7 +104,9 @@ public class ParasitusFix
         }
         if (Loader.isModLoaded("buildcrafttransport")) {
             QuartzKinesisPipeCapRemoval.apply();
-            MoltenMetalFluids.apply();
+        }
+        if (Loader.isModLoaded("bcoreprocessing")) {
+            BuildCraftOreProcessing.apply();
         }
     }
 

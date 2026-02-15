@@ -21,7 +21,11 @@ public final class FluidColorHandler {
 
         Fluid f = FluidRegistry.getFluid(fluidName);
         if (f instanceof BCFluid) {
-            ((BCFluid) f).setColour(argb);
+            BCFluid fluid = (BCFluid) f;
+            fluid.setColour(argb);
+            fluid.setColor(argb);
+        } else if (f != null) {
+            f.setColor(argb);
         }
     }
 }

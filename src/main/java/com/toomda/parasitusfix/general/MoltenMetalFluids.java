@@ -212,11 +212,12 @@ public class MoltenMetalFluids {
         // Texture locations — put your still/flowing textures here.
         // Using a generic "molten" texture tinted by colour is the
         // simplest approach; swap for per-metal textures if desired.
-        ResourceLocation still   = new ResourceLocation("yourmod", "blocks/fluid_molten_still");
-        ResourceLocation flowing = new ResourceLocation("yourmod", "blocks/fluid_molten_flowing");
+        ResourceLocation flowing = new ResourceLocation(ParasitusFix.MODID, "blocks/base_fluid_flow");
+        ResourceLocation still = flowing;
 
         BCFluid fluid = new BCFluid(fluidName, still, flowing);
         fluid.setColour(resolvedColor);
+        fluid.setColor(resolvedColor);
         fluid.setHeat(temp);
         fluid.setHeatable(true);
         fluid.setTemperature(temp);
@@ -232,6 +233,7 @@ public class MoltenMetalFluids {
 
         FluidRegistry.registerFluid(fluid);
         FluidRegistry.addBucketForFluid(fluid);   // optional: gives a bucket item
+        FluidColorHandler.setOverride(fluidName, resolvedColor);
 
         return fluid;
     }
