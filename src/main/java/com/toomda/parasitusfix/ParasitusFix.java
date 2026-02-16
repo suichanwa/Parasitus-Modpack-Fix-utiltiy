@@ -13,6 +13,7 @@ import com.toomda.parasitusfix.sevendaystomine.EnchantItemFix;
 import com.toomda.parasitusfix.sevendaystomine.FlamethrowerTrapFuelSwap;
 import com.toomda.parasitusfix.sevendaystomine.SevenDaysBlockPatches;
 import com.toomda.parasitusfix.sevendaystomine.SevenDaysChanceConfigGuard;
+import com.toomda.parasitusfix.sevendaystomine.SevenDaysBanditNoDespawn;
 import com.toomda.parasitusfix.sevendaystomine.SevenDaysDamagePatches;
 import com.toomda.parasitusfix.sevendaystomine.SevenDaysZombieEndSpawnRestrict;
 import com.toomda.parasitusfix.techguns.TechgunsAttackHelicopterTargetFix;
@@ -83,6 +84,7 @@ public class ParasitusFix
             MinecraftForge.EVENT_BUS.register(new BarbedWireDurabilityFix());
             MinecraftForge.EVENT_BUS.register(new EnchantItemFix());
             MinecraftForge.EVENT_BUS.register(new SevenDaysZombieEndSpawnRestrict());
+            MinecraftForge.EVENT_BUS.register(new SevenDaysBanditNoDespawn());
             MinecraftForge.EVENT_BUS.register(new DoorSeatClickGuard());
             if (Loader.isModLoaded("buildcraftenergy")) {
                 MinecraftForge.EVENT_BUS.register(new FlamethrowerTrapFuelSwap());
