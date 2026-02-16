@@ -9,6 +9,9 @@ public final class ParasitusFixConfig {
     @Config.Name("7DTM Tools")
     public static final SevenDaysTools TOOLS = new SevenDaysTools();
 
+    @Config.Name("7DTM Combat")
+    public static final SevenDaysCombat COMBAT = new SevenDaysCombat();
+
     @Config.Name("Bleeding")
     public static final Bleeding BLEEDING = new Bleeding();
 
@@ -55,6 +58,24 @@ public final class ParasitusFixConfig {
 
         @Config.Comment("Bronze sword base damage")
         public float bronzeSwordDamage = 5.5F;
+    }
+
+    public static final class SevenDaysCombat {
+
+        @Config.Comment("Wooden spikes (and blooded/broken variants) contact damage")
+        public float woodenSpikesDamage = 2.5F;
+
+        @Config.Comment("Metal spikes contact damage")
+        public float metalSpikesDamage = 3.5F;
+
+        @Config.Comment("Barbed wire (razor wire) contact damage")
+        public float barbedWireDamage = 2.5F;
+
+        @Config.Comment("Flamethrower trap burn duration in seconds")
+        public int flameTurretFireSeconds = 4;
+
+        @Config.Comment("Auger base melee damage")
+        public float augerDamage = 6.0F;
     }
 
     public static final class Bleeding {

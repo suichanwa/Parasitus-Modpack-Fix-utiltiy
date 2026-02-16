@@ -49,6 +49,7 @@ public final class SevenDaysDamagePatches {
         setToolDamage("bronze_shovel", cfg.bronzeShovelDamage);
         setToolDamage("bronze_hoe", cfg.bronzeHoeDamage);
         setSwordDamage("bronze_sword", cfg.bronzeSwordDamage);
+        setToolDamage("auger", ParasitusFixConfig.COMBAT.augerDamage);
 
         Map<String, Float> clubBase = new HashMap<>();
         clubBase.put("woodenclub", 4.0F);
