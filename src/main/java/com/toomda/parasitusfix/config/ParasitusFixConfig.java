@@ -15,7 +15,7 @@ public final class ParasitusFixConfig {
     @Config.Name("Bleeding")
     public static final Bleeding BLEEDING = new Bleeding();
 
-    public static final class SevenDaysTools {
+    public final static class SevenDaysTools {
 
         @Config.Comment("Scrap pickaxe base damage")
         public float scrapPickaxeDamage = 3.0F;
@@ -60,7 +60,7 @@ public final class ParasitusFixConfig {
         public float bronzeSwordDamage = 5.5F;
     }
 
-    public static final class SevenDaysCombat {
+    public final static class SevenDaysCombat {
 
         @Config.Comment("Wooden spikes (and blooded/broken variants) contact damage")
         public float woodenSpikesDamage = 2.5F;
@@ -78,7 +78,7 @@ public final class ParasitusFixConfig {
         public float augerDamage = 6.0F;
     }
 
-    public static final class Bleeding {
+    public final static class Bleeding {
 
         @Config.Comment("Absolute damage needed for a single hit to possibly cause bleeding")
         public float singleHitAbs = 6.0F;
