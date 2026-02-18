@@ -10,10 +10,17 @@ import net.minecraft.util.ResourceLocation;
 public class GuiFirstJoinIntro extends GuiScreen {
     private static final ResourceLocation INTRO_IMAGE =
             new ResourceLocation("minecraft", "textures/gui/title/background/panorama_0.png");
+    private static final int FADE_IN_TICKS = 40;
+    private static final int LETTERBOX_IN_TICKS = 26;
+    private static final int LINE_1_START_TICK = 12;
+    private static final int LINE_2_GAP_TICKS = 8;
+
+    private int openTicks;
 
     @Override
     public void initGui() {
         buttonList.clear();
+        openTicks = 0;
         int panelTop = (height - 210) / 2;
         buttonList.add(new GuiButton(
                 0,
@@ -23,6 +30,12 @@ public class GuiFirstJoinIntro extends GuiScreen {
                 20,
                 I18n.format("gui." + ParasitusFix.MODID + ".intro.survive")
         ));
+    }
+
+    @Override
+    public void updateScreen() {
+        super.updateScreen();
+        openTicks++;
     }
 
     @Override
@@ -60,21 +73,51 @@ public class GuiFirstJoinIntro extends GuiScreen {
         mc.getTextureManager().bindTexture(INTRO_IMAGE);
         drawModalRectWithCustomSizedTexture(imageX, imageY, 0.0F, 0.0F, imageWidth, imageHeight, 256.0F, 256.0F);
 
+        String line1 = I18n.format("gui." + ParasitusFix.MODID + ".intro.line1");
+        String line2 = I18n.format("gui." + ParasitusFix.MODID + ".intro.line2");
+        int line2StartTick = LINE_1_START_TICK + line1.length() + LINE_2_GAP_TICKS;
+
         drawCenteredString(
                 fontRenderer,
-                I18n.format("gui." + ParasitusFix.MODID + ".intro.line1"),
+                line1.substring(0, visibleChars(line1, LINE_1_START_TICK)),
                 width / 2,
                 top + 126,
                 0xFFFFFF
         );
         drawCenteredString(
                 fontRenderer,
-                I18n.format("gui." + ParasitusFix.MODID + ".intro.line2"),
+                line2.substring(0, visibleChars(line2, line2StartTick)),
                 width / 2,
                 top + 140,
                 0xE6E6E6
         );
 
         super.drawScreen(mouseX, mouseY, partialTicks);
+        drawLetterboxBars();
+        drawFadeOverlay();
+    }
+
+    private int visibleChars(String text, int startTick) {
+        if (text == null || text.isEmpty()) return 0;
+        int visible = openTicks - startTick;
+        if (visible <= 0) return 0;
+        return Math.min(visible, text.length());
+    }
+
+    private void drawLetterboxBars() {
+        float progress = Math.min(1.0F, openTicks / (float) LETTERBOX_IN_TICKS);
+        float eased = 1.0F - (float) Math.pow(1.0F - progress, 3.0F);
+        int targetHeight = Math.max(20, Math.min(48, height / 6));
+        int barHeight = (int) (targetHeight * eased);
+        if (barHeight <= 0) return;
+
+        drawRect(0, 0, width, barHeight, 0xFF000000);
+        drawRect(0, height - barHeight, width, height, 0xFF000000);
+    }
+
+    private void drawFadeOverlay() {
+        if (openTicks >= FADE_IN_TICKS) return;
+        int alpha = 255 - (openTicks * 255 / FADE_IN_TICKS);
+        drawRect(0, 0, width, height, alpha << 24);
     }
 }
