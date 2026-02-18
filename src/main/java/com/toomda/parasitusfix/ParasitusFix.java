@@ -3,6 +3,9 @@ package com.toomda.parasitusfix;
 import com.toomda.parasitusfix.commands.ParasitusFixCommand;
 import com.toomda.parasitusfix.general.MoltenMetalFluids;
 import com.toomda.parasitusfix.hostileworlds.HostileWorldsAntiSkybase;
+import com.toomda.parasitusfix.intro.FirstJoinIntroEvents;
+import com.toomda.parasitusfix.network.ParasitusFixNetwork;
+import com.toomda.parasitusfix.proxy.CommonProxy;
 import com.toomda.parasitusfix.sevendaystomine.BandageInstantUse;
 import com.toomda.parasitusfix.sevendaystomine.BarbedWireDurabilityFix;
 import com.toomda.parasitusfix.sevendaystomine.BleedDamageLimiter;
@@ -32,6 +35,7 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
+import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
@@ -45,6 +49,12 @@ public class ParasitusFix
     public static final String NAME = "ParasitusFix";
     public static final String VERSION = "1.3";
 
+    @SidedProxy(
+            clientSide = "com.toomda.parasitusfix.proxy.ClientProxy",
+            serverSide = "com.toomda.parasitusfix.proxy.CommonProxy"
+    )
+    public static CommonProxy proxy;
+
     private static Logger logger;
 
     public static org.apache.logging.log4j.Logger getLogger() { return logger; }
@@ -53,6 +63,7 @@ public class ParasitusFix
     public void preInit(FMLPreInitializationEvent event)
     {
         logger = event.getModLog();
+        ParasitusFixNetwork.init();
         if (Loader.isModLoaded("malisisdoors")) {
             ParasitusDoors.registerAll();
             logger.info("Registered Parasitus custom doors (MalisisDoors detected).");
@@ -68,6 +79,7 @@ public class ParasitusFix
     public void init(FMLInitializationEvent event)
     {
         MinecraftForge.EVENT_BUS.register(new CrawlerArmorFix());
+        MinecraftForge.EVENT_BUS.register(new FirstJoinIntroEvents());
 
         if (Loader.isModLoaded("sevendaystomine")) {
             MinecraftForge.EVENT_BUS.register(new BleedingTamer());

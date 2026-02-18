@@ -71,3 +71,8 @@ fluid.molten_diamond_steel.searing=Molten Diamond Steel (Searing)
 fluid.molten_uranium.cool=Molten Uranium (Cool)
 fluid.molten_uranium.hot=Molten Uranium (Hot)
 fluid.molten_uranium.searing=Molten Uranium (Searing)
+
+# Intro Screen
+gui.parasitusfix.intro.line1=The earth heals, yet we decay.
+gui.parasitusfix.intro.line2=5 years has passed You are not new here.
+gui.parasitusfix.intro.survive=Survive
