@@ -4,7 +4,6 @@ import com.toomda.parasitusfix.ParasitusFix;
 import com.toomda.parasitusfix.config.ParasitusFixConfig;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
@@ -24,7 +23,7 @@ public class HostileWorldsAntiSkybase {
     private static final String NBT_KEY_LAST_AIR_WAVE = "parasitusfix:hwInvLastAirWave";
     private static final String NBT_PERSISTED = "PlayerPersisted";
 
-    private static final HwInvReflection HW_INV = new HwInvReflection();
+    private static final HwInvApi HW_INV = new HwInvApi();
 
     @SubscribeEvent
     public void onPlayerTick(TickEvent.PlayerTickEvent event) {
@@ -32,16 +31,15 @@ public class HostileWorldsAntiSkybase {
         EntityPlayer player = event.player;
         if (player == null || player.world.isRemote) return;
 
-        handleHeightWarning(player);
-        handleAirWaveFallback(player);
+        ParasitusFixConfig.HostileWorldsInvasions cfg = ParasitusFixConfig.HOSTILE_WORLDS_INVASIONS;
+        NBTTagCompound runtime = player.getEntityData();
+        NBTTagCompound persisted = getPersisted(player);
+        if (cfg.enableAntiSkybase) handleHeightWarning(player, cfg, runtime, persisted);
+        if (cfg.enableAirInvasionFallback) handleAirWaveFallback(player, cfg, runtime, persisted);
     }
 
-    private void handleHeightWarning(EntityPlayer player) {
-        ParasitusFixConfig.HostileWorldsInvasions cfg = ParasitusFixConfig.HOSTILE_WORLDS_INVASIONS;
-        if (!cfg.enableAntiSkybase) return;
-
+    private void handleHeightWarning(EntityPlayer player, ParasitusFixConfig.HostileWorldsInvasions cfg, NBTTagCompound runtime, NBTTagCompound persisted) {
         boolean above = player.posY > cfg.skyYLevel;
-        NBTTagCompound runtime = player.getEntityData();
         boolean wasAbove = runtime.getBoolean(NBT_KEY_WAS_ABOVE);
         if (!above) {
             if (wasAbove) runtime.setBoolean(NBT_KEY_WAS_ABOVE, false);
@@ -49,7 +47,6 @@ public class HostileWorldsAntiSkybase {
         }
         if (wasAbove) return;
 
-        NBTTagCompound persisted = getPersisted(player);
         int shown = persisted.getInteger(NBT_KEY_WARN_COUNT);
         if (shown < cfg.maxWarningMessages) {
             player.sendMessage(new TextComponentString(cfg.warningMessage));
@@ -58,25 +55,20 @@ public class HostileWorldsAntiSkybase {
         runtime.setBoolean(NBT_KEY_WAS_ABOVE, true);
     }
 
-    private void handleAirWaveFallback(EntityPlayer player) {
-        ParasitusFixConfig.HostileWorldsInvasions cfg = ParasitusFixConfig.HOSTILE_WORLDS_INVASIONS;
-        if (!cfg.enableAirInvasionFallback) return;
-        if (player.dimension != 0) return;
-        if (player.posY <= cfg.skyYLevel) return;
+    private void handleAirWaveFallback(EntityPlayer player, ParasitusFixConfig.HostileWorldsInvasions cfg, NBTTagCompound runtime, NBTTagCompound persisted) {
+        if (player.dimension != 0 || player.posY <= cfg.skyYLevel) return;
 
         Object playerData = HW_INV.getPlayerData(player);
         if (playerData == null) return;
 
-        boolean active = HW_INV.getBoolean(playerData, "dataPlayerInvasionActive", false);
-        NBTTagCompound runtime = player.getEntityData();
+        boolean active = HW_INV.getFieldValue(playerData, "dataPlayerInvasionActive", false);
         boolean wasActive = runtime.getBoolean(NBT_KEY_PREV_ACTIVE);
         runtime.setBoolean(NBT_KEY_PREV_ACTIVE, active);
         if (!active) return;
 
-        int wave = HW_INV.getInt(playerData, "lastWaveNumber", -1);
+        int wave = HW_INV.getFieldValue(playerData, "lastWaveNumber", -1);
         if (wave <= 0) return;
 
-        NBTTagCompound persisted = getPersisted(player);
         if (persisted.getInteger(NBT_KEY_LAST_AIR_WAVE) == wave) return;
 
         boolean shouldSwitch = false;
@@ -87,11 +79,10 @@ public class HostileWorldsAntiSkybase {
         }
 
         if (!shouldSwitch) {
-            int triesAny = HW_INV.getInt(playerData, "triesSinceWorkingAnySpawn", 0);
-            int triesSolid = HW_INV.getInt(playerData, "triesSinceWorkingSolidGroundSpawn", 0);
-            if (triesAny >= cfg.failedSpawnTriesForAirFallback && triesSolid >= cfg.failedSpawnTriesForAirFallback) {
-                shouldSwitch = true;
-            }
+            int triesAny = HW_INV.getFieldValue(playerData, "triesSinceWorkingAnySpawn", 0);
+            int triesSolid = HW_INV.getFieldValue(playerData, "triesSinceWorkingSolidGroundSpawn", 0);
+            shouldSwitch = triesAny >= cfg.failedSpawnTriesForAirFallback
+                    && triesSolid >= cfg.failedSpawnTriesForAirFallback;
         }
 
         if (!shouldSwitch) return;
@@ -108,7 +99,6 @@ public class HostileWorldsAntiSkybase {
         if (!HW_INV.replaceInvasionProfile(playerData, template)) return;
 
         persisted.setInteger(NBT_KEY_LAST_AIR_WAVE, wave);
-
         String waveMessage = HW_INV.getTemplateWaveMessage(template);
         if (waveMessage != null && !waveMessage.isEmpty() && !"<NULL>".equals(waveMessage)) {
             player.sendMessage(new TextComponentString(waveMessage));
@@ -132,56 +122,56 @@ public class HostileWorldsAntiSkybase {
         int step = Math.max(1, stepRaw);
         int minSq = Math.max(0, minRange * minRange);
         int maxSq = Math.max(1, maxRange * maxRange);
-        int cx = center.getX();
-        int cz = center.getZ();
+        BlockPos.MutableBlockPos columnQuery = new BlockPos.MutableBlockPos();
+        BlockPos.MutableBlockPos surface = new BlockPos.MutableBlockPos();
+        BlockPos.MutableBlockPos scratch = new BlockPos.MutableBlockPos();
 
         for (int dx = -maxRange; dx <= maxRange; dx += step) {
             for (int dz = -maxRange; dz <= maxRange; dz += step) {
                 int distSq = dx * dx + dz * dz;
                 if (distSq < minSq || distSq > maxSq) continue;
 
-                int x = cx + dx;
-                int z = cz + dz;
-                int y = world.getTopSolidOrLiquidBlock(new BlockPos(x, 0, z)).getY() - 1;
+                int x = center.getX() + dx;
+                int z = center.getZ() + dz;
+                int y = world.getTopSolidOrLiquidBlock(columnQuery.setPos(x, 0, z)).getY() - 1;
                 if (y <= 0) continue;
 
-                BlockPos surface = new BlockPos(x, y, z);
-                if (isGroundSurfaceSpawnable(world, surface) || isWaterSurfaceSpawnable(world, surface)) {
-                    return true;
+                surface.setPos(x, y, z);
+                IBlockState at = world.getBlockState(surface);
+
+                if (at.getMaterial().blocksMovement()) {
+                    scratch.setPos(x, y + 1, z);
+                    if (world.isAirBlock(scratch)) {
+                        scratch.setPos(x, y + 2, z);
+                        if (world.isAirBlock(scratch)) return true;
+                    }
+                }
+
+                if (at.getMaterial() == Material.WATER) {
+                    scratch.setPos(x, y - 1, z);
+                    if (world.getBlockState(scratch).getMaterial() == Material.WATER) {
+                        scratch.setPos(x, y + 1, z);
+                        if (!world.getBlockState(scratch).isTopSolid()) return true;
+                    }
                 }
             }
         }
         return false;
     }
 
-    private static boolean isGroundSurfaceSpawnable(World world, BlockPos surface) {
-        IBlockState ground = world.getBlockState(surface);
-        if (!ground.getMaterial().blocksMovement()) return false;
-        BlockPos spawnPos = surface.up();
-        return world.isAirBlock(spawnPos) && world.isAirBlock(spawnPos.up());
-    }
-
-    private static boolean isWaterSurfaceSpawnable(World world, BlockPos surface) {
-        IBlockState at = world.getBlockState(surface);
-        IBlockState below = world.getBlockState(surface.down());
-        if (at.getMaterial() != Material.WATER || below.getMaterial() != Material.WATER) return false;
-        return !world.getBlockState(surface.up()).isTopSolid();
-    }
-
-    private static final class HwInvReflection {
+    private static final class HwInvApi {
         private boolean resolved;
         private boolean available;
 
         private Capability<?> playerDataCapability;
-        private Field playerDataCapabilityField;
+        private Method methodDifficultyDataGet;
+        private Method methodResetInvasion;
+        private Method methodInitNewInvasion;
         private Field fieldListMobSpawnTemplates;
         private Field fieldTemplateName;
         private Field fieldTemplateWaveMessage;
         private Field fieldSpawnRangeMin;
         private Field fieldSpawnRangeMax;
-        private Method methodDifficultyDataGet;
-        private Method methodResetInvasion;
-        private Method methodInitNewInvasion;
 
         Object getPlayerData(EntityPlayer player) {
             ensureResolved();
@@ -191,49 +181,30 @@ public class HostileWorldsAntiSkybase {
                 Capability<Object> cap = (Capability<Object>) playerDataCapability;
                 return player.getCapability(cap, null);
             } catch (Throwable t) {
-                ParasitusFix.getLogger().warn("[HW_INV] Failed to read player invasion capability.", t);
-                available = false;
+                disable("[HW_INV] Failed to read player invasion capability.", t);
                 return null;
             }
         }
 
         int getSpawnRangeMinOr(int fallback) {
             ensureResolved();
-            if (!available) return fallback;
-            try {
-                return fieldSpawnRangeMin.getInt(null);
-            } catch (Throwable ignored) {
-                return fallback;
-            }
+            return getStaticInt(fieldSpawnRangeMin, fallback);
         }
 
         int getSpawnRangeMaxOr(int fallback) {
             ensureResolved();
-            if (!available) return fallback;
-            try {
-                return fieldSpawnRangeMax.getInt(null);
-            } catch (Throwable ignored) {
-                return fallback;
-            }
+            return getStaticInt(fieldSpawnRangeMax, fallback);
         }
 
-        int getInt(Object instance, String fieldName, int fallback) {
+        <T> T getFieldValue(Object instance, String fieldName, T fallback) {
             ensureResolved();
             if (!available || instance == null) return fallback;
             try {
-                Field f = instance.getClass().getField(fieldName);
-                return f.getInt(instance);
-            } catch (Throwable ignored) {
-                return fallback;
-            }
-        }
-
-        boolean getBoolean(Object instance, String fieldName, boolean fallback) {
-            ensureResolved();
-            if (!available || instance == null) return fallback;
-            try {
-                Field f = instance.getClass().getField(fieldName);
-                return f.getBoolean(instance);
+                Object value = instance.getClass().getField(fieldName).get(instance);
+                if (value == null) return fallback;
+                @SuppressWarnings("unchecked")
+                T casted = (T) value;
+                return casted;
             } catch (Throwable ignored) {
                 return fallback;
             }
@@ -242,33 +213,20 @@ public class HostileWorldsAntiSkybase {
         Object findTemplate(String primaryName, String[] fallbackNames) {
             ensureResolved();
             if (!available) return null;
-
-            List<String> candidates = new ArrayList<>();
-            if (primaryName != null && !primaryName.trim().isEmpty()) {
-                candidates.add(primaryName.trim());
-            }
-            if (fallbackNames != null) {
-                for (String name : fallbackNames) {
-                    if (name == null) continue;
-                    String n = name.trim();
-                    if (!n.isEmpty()) candidates.add(n);
-                }
-            }
-            if (candidates.isEmpty()) return null;
-
             try {
                 Object difficultyData = methodDifficultyDataGet.invoke(null);
                 @SuppressWarnings("unchecked")
                 List<Object> templates = (List<Object>) fieldListMobSpawnTemplates.get(difficultyData);
-                for (String wanted : candidates) {
-                    for (Object template : templates) {
-                        String name = String.valueOf(fieldTemplateName.get(template));
-                        if (wanted.equals(name)) return template;
+                Object match = findTemplateByName(templates, primaryName);
+                if (match != null) return match;
+                if (fallbackNames != null) {
+                    for (String fallbackName : fallbackNames) {
+                        match = findTemplateByName(templates, fallbackName);
+                        if (match != null) return match;
                     }
                 }
             } catch (Throwable t) {
-                ParasitusFix.getLogger().warn("[HW_INV] Failed to read invasion templates.", t);
-                available = false;
+                disable("[HW_INV] Failed to read invasion templates.", t);
             }
             return null;
         }
@@ -302,8 +260,7 @@ public class HostileWorldsAntiSkybase {
                 methodInitNewInvasion.invoke(playerData, template);
                 return true;
             } catch (Throwable t) {
-                ParasitusFix.getLogger().warn("[HW_INV] Failed to replace invasion profile.", t);
-                available = false;
+                disable("[HW_INV] Failed to replace invasion profile.", t);
                 return false;
             }
         }
@@ -313,8 +270,7 @@ public class HostileWorldsAntiSkybase {
             resolved = true;
             try {
                 Class<?> invasionClass = Class.forName("com.corosus.inv.Invasion");
-                playerDataCapabilityField = invasionClass.getField("PLAYER_DATA_INSTANCE");
-                Object capabilityObj = playerDataCapabilityField.get(null);
+                Object capabilityObj = invasionClass.getField("PLAYER_DATA_INSTANCE").get(null);
                 if (!(capabilityObj instanceof Capability)) {
                     throw new IllegalStateException("Invasion.PLAYER_DATA_INSTANCE is not a Capability");
                 }
@@ -322,15 +278,7 @@ public class HostileWorldsAntiSkybase {
 
                 Class<?> playerDataClass = Class.forName("com.corosus.inv.capabilities.PlayerDataInstance");
                 methodResetInvasion = playerDataClass.getMethod("resetInvasion");
-                for (Method method : playerDataClass.getMethods()) {
-                    if ("initNewInvasion".equals(method.getName()) && method.getParameterCount() == 1) {
-                        methodInitNewInvasion = method;
-                        break;
-                    }
-                }
-                if (methodInitNewInvasion == null) {
-                    throw new NoSuchMethodException("PlayerDataInstance.initNewInvasion");
-                }
+                methodInitNewInvasion = findInitNewInvasion(playerDataClass);
 
                 Class<?> difficultyDataReaderClass = Class.forName("CoroUtil.difficulty.data.DifficultyDataReader");
                 methodDifficultyDataGet = difficultyDataReaderClass.getMethod("getData");
@@ -347,9 +295,41 @@ public class HostileWorldsAntiSkybase {
 
                 available = true;
             } catch (Throwable t) {
-                available = false;
-                ParasitusFix.getLogger().warn("[HW_INV] Anti-skybase integration unavailable.", t);
+                disable("[HW_INV] Anti-skybase integration unavailable.", t);
             }
+        }
+
+        private static Method findInitNewInvasion(Class<?> playerDataClass) throws NoSuchMethodException {
+            for (Method method : playerDataClass.getMethods()) {
+                if ("initNewInvasion".equals(method.getName()) && method.getParameterCount() == 1) {
+                    return method;
+                }
+            }
+            throw new NoSuchMethodException("PlayerDataInstance.initNewInvasion");
+        }
+
+        private Object findTemplateByName(List<Object> templates, String rawName) throws IllegalAccessException {
+            if (rawName == null) return null;
+            String name = rawName.trim();
+            if (name.isEmpty()) return null;
+            for (Object template : templates) {
+                if (name.equals(String.valueOf(fieldTemplateName.get(template)))) return template;
+            }
+            return null;
+        }
+
+        private int getStaticInt(Field field, int fallback) {
+            if (!available || field == null) return fallback;
+            try {
+                return field.getInt(null);
+            } catch (Throwable ignored) {
+                return fallback;
+            }
+        }
+
+        private void disable(String message, Throwable t) {
+            available = false;
+            ParasitusFix.getLogger().warn(message, t);
         }
     }
 }
